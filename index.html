@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Strategy — Financial Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#070707;--panel:#0c0c0c;--panel2:#101010;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --text:#f2f4f6;--muted:#a0a8b0;--faint:#5c656e;
+  --accent:#ff6414;--green:#19c37d;--gold:#f0b90b;--cyan:#2dc6ff;--red:#ff4d6d;
+  --radius:14px;--nav-w:220px;
+  --input-bg:#111416;--input-border:rgba(255,255,255,.15);--input-focus:rgba(255,100,20,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOP BAR */
+.topbar{background:var(--accent);color:#111;padding:13px 24px;font-weight:800;font-size:1.5rem;letter-spacing:-.03em;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:100;height:52px}
+.topbar small{font-size:.82rem;font-weight:600;opacity:.75}
+
+/* SHELL */
+.shell{display:flex;flex:1;padding-top:52px}
+
+/* SIDEBAR NAV */
+.sidenav{
+  width:var(--nav-w);min-width:var(--nav-w);
+  background:#090909;border-right:1px solid var(--border);
+  position:fixed;top:52px;bottom:0;left:0;z-index:50;
+  display:flex;flex-direction:column;padding:18px 0 24px;
+  overflow-y:auto;
+}
+.nav-section{padding:8px 14px 4px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--faint)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;font-size:.88rem;font-weight:600;color:var(--muted);
+  cursor:pointer;border-left:3px solid transparent;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:rgba(255,100,20,.1);color:var(--accent);border-left-color:var(--accent)}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+.nav-divider{height:1px;background:var(--border);margin:10px 14px}
+
+/* MAIN CONTENT */
+.main-content{margin-left:var(--nav-w);flex:1;overflow-y:auto}
+.page{display:none;padding:20px 20px 60px}
+.page.active{display:block}
+.wrap-inner{max-width:1480px;margin:0 auto}
+
+/* PANELS */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.panel-head{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--panel2);display:flex;align-items:center;justify-content:space-between}
+.panel-head h2{font-size:.9rem;font-weight:700;letter-spacing:-.01em}
+.panel-head span{color:var(--muted);font-size:.78rem}
+.panel-body{padding:14px 16px}
+
+/* INPUT TABLE */
+.inp-table{width:100%;border-collapse:collapse}
+.inp-table tr{border-bottom:1px solid rgba(255,255,255,.04)}
+.inp-table tr:last-child{border-bottom:none}
+.inp-table td{padding:5px 4px;vertical-align:middle}
+.inp-table td:first-child{color:var(--muted);font-size:.85rem;width:56%}
+.inp-table td:last-child{text-align:right;width:44%}
+input.cell{width:100%;text-align:right;background:var(--input-bg);border:1px solid var(--input-border);border-radius:6px;padding:5px 8px;color:var(--text);font-family:'Inter',sans-serif;font-size:.88rem;font-variant-numeric:tabular-nums;font-weight:600;outline:none;transition:border-color .18s,box-shadow .18s}
+input.cell:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--input-focus)}
+.calc-val{color:#eaf3ff;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
+.fin th{padding:9px 12px;border-bottom:2px solid var(--border2);font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;background:var(--panel2);white-space:nowrap;text-align:right}
+.fin th:first-child{text-align:left}
+.fin td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fin td:first-child{text-align:left;font-weight:600;color:#e8eef4}
+.fin tr:hover td{background:rgba(255,255,255,.02)}
+.fin .subtotal td{background:rgba(255,255,255,.03);font-weight:700}
+.fin .total td{background:rgba(45,198,255,.06);font-weight:800;color:#cce8ff}
+.fin .section-hdr td{background:#0f0f0f;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.07em;padding:10px 12px 6px;font-weight:700}
+.pos{color:var(--green)} .neg{color:var(--red)}
+.yoy-pos{color:var(--green);font-size:.82rem} .yoy-neg{color:var(--red);font-size:.82rem}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.kpi .k{color:var(--muted);font-size:.76rem;text-transform:uppercase;letter-spacing:.07em}
+.kpi .v{margin-top:7px;font-size:1.18rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .s{margin-top:4px;color:var(--faint);font-size:.76rem}
+
+/* mNAV CALC */
+.mnav-calc{border:1px solid rgba(240,185,11,.3);border-radius:12px;background:rgba(240,185,11,.05);padding:14px 16px;margin-bottom:14px}
+.mnav-calc-row{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:10px}
+.mnav-calc label{color:var(--muted);font-size:.85rem;white-space:nowrap}
+.mnav-calc input.cell{width:110px;border-color:rgba(240,185,11,.4)}
+.mnav-calc input.cell:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(240,185,11,.25)}
+.mnav-arrow{color:var(--muted);font-size:.9rem;white-space:nowrap}
+.mnav-val{font-weight:800;font-size:.95rem;font-variant-numeric:tabular-nums}
+.mnav-regime{font-weight:700;font-size:.9rem}
+.mnav-target{color:var(--accent);font-weight:800;font-size:.95rem;font-variant-numeric:tabular-nums}
+.mnav-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--gold);display:flex;align-items:center;gap:6px}
+
+/* TOGGLE TABS */
+.toggle-tabs{display:flex;gap:0;margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.toggle-tab{flex:1;padding:11px 16px;font-size:.88rem;font-weight:700;cursor:pointer;background:var(--panel2);color:var(--muted);border:none;transition:background .18s,color .18s;text-align:center}
+.toggle-tab.active-a{background:#1e1e1e;color:var(--text)}
+.toggle-tab.active-b{background:var(--gold);color:#111}
+
+/* BRIDGE */
+.bridge{background:var(--panel2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.bridge-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.05)}
+.bridge-row:last-child{border-bottom:none}
+.bridge-row.total-ev{background:rgba(45,198,255,.07);border-top:1px solid rgba(45,198,255,.2);border-bottom:1px solid rgba(45,198,255,.2)}
+.bridge-row.total-eq{background:rgba(25,195,125,.07);border-top:1px solid rgba(25,195,125,.2)}
+.bridge-row.price-row{background:linear-gradient(90deg,rgba(255,100,20,.12),rgba(255,160,20,.08));border-top:2px solid var(--accent)}
+.bridge-label{font-size:.88rem;color:var(--muted);font-weight:500}
+.bridge-label strong{color:var(--text);font-weight:700}
+.bridge-val{font-weight:800;font-size:.95rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bridge-val.pos{color:var(--green)}.bridge-val.neg{color:var(--red)}.bridge-val.total{color:var(--cyan)}.bridge-val.eq{color:var(--green)}.bridge-val.price{color:var(--accent);font-size:1.5rem;letter-spacing:-.03em}
+
+/* BOTTOM GRID */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.chart-panel{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px}
+.chart-panel h3{font-size:.88rem;font-weight:700;margin-bottom:12px}
+
+/* DCF LAYOUT */
+.dcf-layout{display:grid;grid-template-columns:380px 1fr;gap:14px}
+.dcf-sidebar{display:flex;flex-direction:column;gap:14px}
+
+.gap{height:10px}
+.section-title{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);padding:10px 4px 4px;border-bottom:1px solid var(--border);margin-bottom:8px}
+
+/* BS PAGE */
+.bs-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.page-title{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:.85rem;margin-bottom:16px}
+
+/* NAV TOGGLE */
+.nav-toggle{
+  background:rgba(255,255,255,.12);border:none;
+  color:#111;cursor:pointer;border-radius:8px;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;font-weight:700;line-height:1;
+  transition:background .15s;flex-shrink:0;
+}
+.nav-toggle:hover{background:rgba(255,255,255,.25)}
+
+/* Sidebar transitions */
+.sidenav{
+  transition:transform .25s cubic-bezier(.4,0,.2,1), width .25s cubic-bezier(.4,0,.2,1), opacity .2s;
+}
+.sidenav.collapsed{
+  transform:translateX(-100%);
+  width:0;min-width:0;
+  opacity:0;pointer-events:none;
+}
+.main-content{
+  transition:margin-left .25s cubic-bezier(.4,0,.2,1);
+}
+.main-content.expanded{
+  margin-left:0;
+}
+
+/* Overlay for mobile */
+.nav-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:45;
+  backdrop-filter:blur(2px);
+}
+.nav-overlay.visible{display:block}
+
+@media(max-width:1100px){.dcf-layout{grid-template-columns:1fr}.bottom-grid{grid-template-columns:1fr}.kpis,.bs-kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){
+  .sidenav{position:fixed;z-index:50}
+  .main-content{margin-left:0!important}
+}
+
+/* ── SWOT ── */
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.swot-cell{padding:22px 24px;min-height:280px}
+.swot-cell h3{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.swot-cell ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.swot-cell ul li{font-size:.88rem;line-height:1.55;padding-left:14px;position:relative;color:rgba(255,255,255,.9)}
+.swot-cell ul li::before{content:"·";position:absolute;left:0;font-weight:900}
+.sw-s{background:rgba(25,195,125,.12);border-right:1px solid rgba(25,195,125,.2);border-bottom:1px solid rgba(25,195,125,.2)}
+.sw-s h3{color:var(--green)}
+.sw-w{background:rgba(255,77,109,.1);border-bottom:1px solid rgba(255,77,109,.2)}
+.sw-w h3{color:var(--red)}
+.sw-o{background:rgba(45,198,255,.08);border-right:1px solid rgba(45,198,255,.2)}
+.sw-o h3{color:var(--cyan)}
+.sw-t{background:rgba(240,185,11,.08)}
+.sw-t h3{color:var(--gold)}
+
+/* ── PESTEL ── */
+.pestel-grid{display:flex;flex-direction:column;gap:12px}
+.pestel-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.pestel-header{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.pestel-letter{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;flex-shrink:0}
+.pestel-title{font-weight:700;font-size:.95rem}
+.pestel-sub{color:var(--muted);font-size:.78rem;margin-top:1px}
+.pestel-body{padding:14px 18px;display:flex;flex-direction:column;gap:7px}
+.pestel-body p{font-size:.87rem;line-height:1.6;color:rgba(255,255,255,.85);padding-left:14px;position:relative}
+.pestel-body p::before{content:"▸";position:absolute;left:0;color:var(--faint);font-size:.7rem;top:3px}
+
+/* ── PORTER ── */
+.porter-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.porter-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.porter-card.center{grid-column:1/-1}
+.porter-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--panel2)}
+.porter-head h3{font-size:.9rem;font-weight:700}
+.porter-badge{padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:700}
+.badge-high{background:rgba(255,77,109,.18);color:var(--red)}
+.badge-med{background:rgba(240,185,11,.18);color:var(--gold)}
+.badge-low{background:rgba(25,195,125,.18);color:var(--green)}
+.porter-body{padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.porter-body p{font-size:.86rem;line-height:1.58;color:rgba(255,255,255,.85);padding-left:14px;position:relative}
+.porter-body p::before{content:"▸";position:absolute;left:0;color:var(--faint);font-size:.7rem;top:3px}
+.porter-meter{margin-top:8px}
+.porter-meter-label{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:5px}
+.porter-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.porter-bar-fill{height:100%;border-radius:999px;transition:width .6s ease}
+@media(max-width:900px){.swot-grid,.porter-grid{grid-template-columns:1fr}.porter-card.center{grid-column:auto}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <button class="nav-toggle" id="navToggleBtn" onclick="toggleNav()" title="Toggle menu">
+      <span id="toggleIcon">☰</span>
+    </button>
+    <div>Strategy<span style="font-size:.6em;vertical-align:super;margin-left:1px">₿</span></div>
+  </div>
+  <small>Financial Model</small>
+</div>
+
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="shell">
+
+  <!-- ══ SIDEBAR NAV ══ -->
+  <nav class="sidenav">
+    <div class="nav-section">Estratégia</div>
+    <div class="nav-item" onclick="showPage('swot')" id="nav-swot">
+      <span class="nav-icon">🎯</span>SWOT
+    </div>
+    <div class="nav-item" onclick="showPage('pestel')" id="nav-pestel">
+      <span class="nav-icon">🌍</span>PESTEL
+    </div>
+    <div class="nav-item" onclick="showPage('porter')" id="nav-porter">
+      <span class="nav-icon">⚡</span>5 Forças Porter
+    </div>
+    <div class="nav-item" onclick="showPage('instrumentos')" id="nav-instrumentos">
+      <span class="nav-icon">💎</span>Instrumentos de Capital
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Financeiros</div>
+    <div class="nav-item" onclick="showPage('bs')" id="nav-bs">
+      <span class="nav-icon">🏦</span>Balance Sheet
+    </div>
+    <div class="nav-item" onclick="showPage('is')" id="nav-is">
+      <span class="nav-icon">📈</span>Income Statement
+    </div>
+    <div class="nav-item" onclick="showPage('cf')" id="nav-cf">
+      <span class="nav-icon">💵</span>Cash Flow
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Rácios</div>
+    <div class="nav-item" onclick="showPage('ratios')" id="nav-ratios">
+      <span class="nav-icon">🔢</span>Ratios
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Correlação</div>
+    <div class="nav-item" onclick="showPage('correlacao')" id="nav-correlacao">
+      <span class="nav-icon">📉</span>Correlação MSTR/BTC
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Avaliação</div>
+    <div class="nav-item active" onclick="showPage('dcf')" id="nav-dcf">
+      <span class="nav-icon">📊</span>DCF / mNAV
+    </div>
+    <div class="nav-item" onclick="showPage('multiples')" id="nav-multiples">
+      <span class="nav-icon">🧮</span>Múltiplos SOTP
+    </div>
+    <div class="nav-item" onclick="showPage('rec')" id="nav-rec">
+      <span class="nav-icon">✅</span>Recomendação
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-section">Modelos de Precificação</div>
+    <!-- ============================================================
+         PASSO 1: Substitui URL_MODELO_I pelo link do Modelo de Precificação I
+         Exemplo: href="https://docs.google.com/spreadsheets/d/SEU_ID"
+         ============================================================ -->
+    <a href="https://btc-model-marcos.streamlit.app/" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="nav-item" id="nav-modelo1">
+        <span class="nav-icon">📄</span>Modelo Macro Bitcoin
+      </div>
+    </a>
+    <!-- ============================================================
+         PASSO 2: Substitui URL_MODELO_II pelo link do Modelo de Precificação II
+         Exemplo: href="https://docs.google.com/spreadsheets/d/SEU_ID"
+         ============================================================ -->
+    <a href="https://strategy-model.streamlit.app/" target="_blank" style="text-decoration:none;color:inherit;">
+      <div class="nav-item" id="nav-modelo2">
+        <span class="nav-icon">📄</span>Strategy: Valuation by BTC and Liquidity Stress Test
+      </div>
+    </a>
+    <div class="nav-item" onclick="showPage('pressupostos')" id="nav-pressupostos">
+      <span class="nav-icon">📋</span>Pressupostos dos Modelos
+    </div>
+  </nav>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="main-content">
+
+    <!-- ═══════════ PAGE: DCF ═══════════ -->
+    <div class="page active" id="page-dcf">
+    <div class="wrap-inner">
+
+      <!-- mNAV Calculator -->
+      <div class="mnav-calc">
+        <div class="mnav-title">mNAV Calculator — insere o preço de mercado actual do MSTR</div>
+        <div class="mnav-calc-row">
+          <label>Preço mercado MSTR ($):</label>
+          <input class="cell" id="i_mktprice" value="177.50" style="width:120px">
+          <span class="mnav-arrow">→ mNAV implícito:</span>
+          <span class="mnav-val" id="o_mnavImpl">—</span>
+          <span class="mnav-arrow">→ Regime:</span>
+          <span class="mnav-regime" id="o_regime">—</span>
+          <span class="mnav-arrow">→ Preço-alvo (mNAV impl.):</span>
+          <span class="mnav-target" id="o_targetImpl">—</span>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi"><div class="k">Σ PV(FCFF)</div><div class="v" id="o_sumPv">—</div><div class="s">USD milhares</div></div>
+        <div class="kpi"><div class="k">Terminal Value</div><div class="v" id="o_tv">—</div><div class="s">USD milhares</div></div>
+        <div class="kpi"><div class="k">PV(Terminal Value)</div><div class="v" id="o_pvtv">—</div><div class="s">USD milhares</div></div>
+        <div class="kpi"><div class="k">EV Software</div><div class="v" id="o_evsw">—</div><div class="s">USD milhares</div></div>
+      </div>
+
+      <!-- Toggle -->
+      <div class="toggle-tabs">
+        <button class="toggle-tab active-a" id="tab_a" onclick="setTab('A')">Método A — DCF Puro (BTC c/ desconto holding)</button>
+        <button class="toggle-tab" id="tab_b" onclick="setTab('B')">Método B — mNAV Target (BTC × múltiplo mercado)</button>
+      </div>
+
+      <!-- DCF Layout: sidebar + main -->
+      <div class="dcf-layout">
+
+        <!-- Sidebar Inputs -->
+        <div class="dcf-sidebar">
+
+          <div class="panel">
+            <div class="panel-head"><h2>DCF Base</h2><span>inputs editáveis</span></div>
+            <div class="panel-body">
+              <div class="section-title">Taxas & Risco</div>
+              <table class="inp-table">
+                <tr><td>Risk-Free Rate (rf)</td><td><input class="cell" id="i_rf" value="4.16"></td></tr>
+                <tr><td>Beta (β)</td><td><input class="cell" id="i_beta" value="3.55"></td></tr>
+                <tr><td>Equity Risk Premium (ERP)</td><td><input class="cell" id="i_erp" value="4.23"></td></tr>
+                <tr><td>Custo Dívida (Kd)</td><td><input class="cell" id="i_kd" value="0.80"></td></tr>
+                <tr><td>Taxa Imposto (τ)</td><td><input class="cell" id="i_tax" value="25.63"></td></tr>
+              </table>
+              <div class="gap"></div>
+              <div class="section-title">Estrutura de Capital</div>
+              <table class="inp-table">
+                <tr><td>Dívida Mercado D</td><td><input class="cell" id="i_debt" value="8190155"></td></tr>
+                <tr><td>Equity Mercado E</td><td><input class="cell" id="i_equity" value="47417821"></td></tr>
+                <tr><td>Ke</td><td><span class="calc-val" id="o_ke">—</span></td></tr>
+                <tr><td>V = D + E</td><td><span class="calc-val" id="o_v">—</span></td></tr>
+                <tr><td>WACC</td><td><span class="calc-val" id="o_wacc">—</span></td></tr>
+              </table>
+              <div class="gap"></div>
+              <div class="section-title">BTC & Capitalização</div>
+              <table class="inp-table">
+                <tr><td>BTC Detidos</td><td><input class="cell" id="i_btc" value="672500"></td></tr>
+                <tr><td>Preço BTC ($) atual</td><td><input class="cell" id="i_btcpx" value="87515"></td></tr>
+                <tr><td>Desconto Holding (A)</td><td><input class="cell" id="i_disc" value="10"></td></tr>
+                <tr><td>mNAV Target (B)</td><td><input class="cell" id="i_mnav" value="1.57"></td></tr>
+                <tr><td>Caixa</td><td><input class="cell" id="i_cash" value="2301470"></td></tr>
+                <tr><td>Dívida Bruta</td><td><input class="cell" id="i_debtbr" value="8190155"></td></tr>
+                <tr><td>Preferred Stock</td><td><input class="cell" id="i_pref" value="6919514"></td></tr>
+                <tr><td>Ações Diluídas</td><td><input class="cell" id="i_shares" value="312062"></td></tr>
+              </table>
+              <div class="gap"></div>
+              <div class="section-title">Receita Base</div>
+              <table class="inp-table">
+                <tr><td>Receita 2025A (USD $k)</td><td><input class="cell" id="i_rev0" value="477233"></td></tr>
+                <tr><td>g Perpetuidade (TV)</td><td><input class="cell" id="i_g" value="2.50"></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Crescimento Receita</h2><span>% anual</span></div>
+            <div class="panel-body">
+              <table class="inp-table">
+                <tr><td>g Receita 2026</td><td><input class="cell" id="i_gr1" value="3.00"></td></tr>
+                <tr><td>g Receita 2027</td><td><input class="cell" id="i_gr2" value="5.00"></td></tr>
+                <tr><td>g Receita 2028</td><td><input class="cell" id="i_gr3" value="7.00"></td></tr>
+                <tr><td>g Receita 2029</td><td><input class="cell" id="i_gr4" value="8.00"></td></tr>
+                <tr><td>g Receita 2030</td><td><input class="cell" id="i_gr5" value="8.00"></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>Margem EBITDA</h2><span>% por ano</span></div>
+            <div class="panel-body">
+              <table class="inp-table">
+                <tr><td>Margem EBITDA 2026</td><td><input class="cell" id="i_em1" value="15.00"></td></tr>
+                <tr><td>Margem EBITDA 2027</td><td><input class="cell" id="i_em2" value="17.00"></td></tr>
+                <tr><td>Margem EBITDA 2028</td><td><input class="cell" id="i_em3" value="19.00"></td></tr>
+                <tr><td>Margem EBITDA 2029</td><td><input class="cell" id="i_em4" value="21.00"></td></tr>
+                <tr><td>Margem EBITDA 2030</td><td><input class="cell" id="i_em5" value="22.00"></td></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h2>D&A, CapEx & ΔWC</h2><span>USD milhares</span></div>
+            <div class="panel-body">
+              <div class="section-title">D&A</div>
+              <table class="inp-table">
+                <tr><td>D&A 2026</td><td><input class="cell" id="i_da1" value="27035.25"></td></tr>
+                <tr><td>D&A 2027</td><td><input class="cell" id="i_da2" value="28387.01"></td></tr>
+                <tr><td>D&A 2028</td><td><input class="cell" id="i_da3" value="30374.10"></td></tr>
+                <tr><td>D&A 2029</td><td><input class="cell" id="i_da4" value="32804.03"></td></tr>
+                <tr><td>D&A 2030</td><td><input class="cell" id="i_da5" value="35428.35"></td></tr>
+              </table>
+              <div class="gap"></div>
+              <div class="section-title">CapEx</div>
+              <table class="inp-table">
+                <tr><td>CapEx 2026</td><td><input class="cell" id="i_cx1" value="9831.00"></td></tr>
+                <tr><td>CapEx 2027</td><td><input class="cell" id="i_cx2" value="10322.55"></td></tr>
+                <tr><td>CapEx 2028</td><td><input class="cell" id="i_cx3" value="11045.13"></td></tr>
+                <tr><td>CapEx 2029</td><td><input class="cell" id="i_cx4" value="11928.74"></td></tr>
+                <tr><td>CapEx 2030</td><td><input class="cell" id="i_cx5" value="12883.04"></td></tr>
+              </table>
+              <div class="gap"></div>
+              <div class="section-title">ΔWC</div>
+              <table class="inp-table">
+                <tr><td>ΔWC 2026</td><td><input class="cell" id="i_wc1" value="4915.50"></td></tr>
+                <tr><td>ΔWC 2027</td><td><input class="cell" id="i_wc2" value="5161.27"></td></tr>
+                <tr><td>ΔWC 2028</td><td><input class="cell" id="i_wc3" value="5522.56"></td></tr>
+                <tr><td>ΔWC 2029</td><td><input class="cell" id="i_wc4" value="5964.37"></td></tr>
+                <tr><td>ΔWC 2030</td><td><input class="cell" id="i_wc5" value="6441.52"></td></tr>
+              </table>
+            </div>
+          </div>
+
+        </div>
+        <!-- END DCF Sidebar -->
+
+        <!-- DCF Main -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <div class="panel">
+            <div class="panel-head"><h2>FCFF Projetado 2026–2030</h2><span>USD milhares</span></div>
+            <div class="tbl-wrap">
+              <table class="fin">
+                <thead>
+                  <tr>
+                    <th>Rubrica</th>
+                    <th>2026</th><th>2027</th><th>2028</th><th>2029</th><th>2030</th>
+                  </tr>
+                </thead>
+                <tbody id="forecastBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="bottom-grid">
+            <div>
+              <div style="font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:8px" id="bridgeTitle">BRIDGE SOTP — MÉTODO A</div>
+              <div class="bridge" id="bridgeBlock"></div>
+            </div>
+            <div class="chart-panel">
+              <h3>FCFF Projetado 2026–2030</h3>
+              <canvas id="fcffChart"></canvas>
+            </div>
+          </div>
+
+        </div>
+        <!-- END DCF Main -->
+
+      </div>
+    </div>
+    </div>
+    <!-- END PAGE DCF -->
+
+    <!-- ═══════════ PAGE: BALANCE SHEET ═══════════ -->
+    <div class="page" id="page-bs">
+    <div class="wrap-inner">
+      <div class="page-title">Consolidated Balance Sheet</div>
+      <div class="page-sub">Strategy Inc — in thousands USD, except per share data</div>
+
+      <div class="bs-kpis">
+        <div class="kpi"><div class="k">Total Assets 2025</div><div class="v" style="color:var(--cyan)">$61.6B</div><div class="s">+138,5% YoY</div></div>
+        <div class="kpi"><div class="k">Digital Assets 2025</div><div class="v" style="color:var(--gold)">$58.9B</div><div class="s">95,5% of Total Assets</div></div>
+        <div class="kpi"><div class="k">Total Liabilities 2025</div><div class="v" style="color:var(--red)">$10.6B</div><div class="s">+39,2% YoY</div></div>
+        <div class="kpi"><div class="k">Total Equity 2025</div><div class="v" style="color:var(--green)">$44.1B</div><div class="s">+142,0% YoY</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Assets</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead>
+              <tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr>
+            </thead>
+            <tbody>
+              <tr class="section-hdr"><td colspan="6">Current Assets</td></tr>
+              <tr><td>Cash and cash equivalents</td><td>2 301 470</td><td>38 117</td><td>46 817</td><td class="yoy-pos">+5937,91%</td><td class="yoy-neg">-18,58%</td></tr>
+              <tr><td>Restricted cash</td><td>1 873</td><td>1 780</td><td>1 856</td><td class="yoy-pos">+5,22%</td><td class="yoy-neg">-4,09%</td></tr>
+              <tr><td>Accounts receivable, net</td><td>205 748</td><td>181 203</td><td>183 815</td><td class="yoy-pos">+13,55%</td><td class="yoy-neg">-1,42%</td></tr>
+              <tr><td>Prepaid expenses and other current assets</td><td>55 046</td><td>31 224</td><td>35 407</td><td class="yoy-pos">+76,29%</td><td class="yoy-neg">-11,81%</td></tr>
+              <tr class="subtotal"><td>Total current assets</td><td>2 564 137</td><td>252 324</td><td>267 895</td><td class="yoy-pos">+916,21%</td><td class="yoy-neg">-5,81%</td></tr>
+              <tr><td>Digital assets</td><td>58 854 028</td><td>23 909 373</td><td>3 626 476</td><td class="yoy-pos">+146,15%</td><td class="yoy-pos">+559,30%</td></tr>
+              <tr><td>Property and equipment, net</td><td>28 858</td><td>26 327</td><td>28 941</td><td class="yoy-pos">+9,61%</td><td class="yoy-neg">-9,03%</td></tr>
+              <tr><td>Right-of-use assets</td><td>46 975</td><td>54 560</td><td>57 343</td><td class="yoy-neg">-13,90%</td><td class="yoy-neg">-4,85%</td></tr>
+              <tr><td>Deposits and other assets</td><td>142 577</td><td>75 794</td><td>24 300</td><td class="yoy-pos">+88,11%</td><td class="yoy-pos">+211,91%</td></tr>
+              <tr><td>Deferred tax assets, net</td><td>4 507</td><td>1 525 307</td><td>757 573</td><td class="yoy-neg">-99,70%</td><td class="yoy-pos">+101,34%</td></tr>
+              <tr class="total"><td>Total assets</td><td>61 641 082</td><td>25 843 685</td><td>4 762 528</td><td class="yoy-pos">+138,52%</td><td class="yoy-pos">+442,65%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Liabilities</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead>
+              <tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr>
+            </thead>
+            <tbody>
+              <tr class="section-hdr"><td colspan="6">Current Liabilities</td></tr>
+              <tr><td>Accounts payable, accrued expenses &amp; operating lease liabilities</td><td>50 335</td><td>52 982</td><td>43 090</td><td class="yoy-neg">-5,00%</td><td class="yoy-pos">+22,96%</td></tr>
+              <tr><td>Accrued compensation and employee benefits</td><td>69 986</td><td>58 362</td><td>50 045</td><td class="yoy-pos">+19,92%</td><td class="yoy-pos">+16,62%</td></tr>
+              <tr><td>Accrued interest</td><td>5 619</td><td>5 549</td><td>1 493</td><td class="yoy-pos">+1,26%</td><td class="yoy-pos">+271,67%</td></tr>
+              <tr><td>Preferred dividends payable</td><td>27 121</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Current portion of long-term debt, net</td><td>31 313</td><td>517</td><td>483</td><td class="yoy-pos">+5956,67%</td><td class="yoy-pos">+7,04%</td></tr>
+              <tr><td>Deferred revenue and advance payments</td><td>272 118</td><td>237 974</td><td>228 162</td><td class="yoy-pos">+14,35%</td><td class="yoy-pos">+4,30%</td></tr>
+              <tr class="subtotal"><td>Total current liabilities</td><td>456 492</td><td>355 384</td><td>323 273</td><td class="yoy-pos">+28,45%</td><td class="yoy-pos">+9,93%</td></tr>
+              <tr><td>Long-term debt, net</td><td>8 158 842</td><td>7 191 158</td><td>2 182 108</td><td class="yoy-pos">+13,46%</td><td class="yoy-pos">+229,55%</td></tr>
+              <tr><td>Deferred revenue and advance payments (LT)</td><td>5 451</td><td>4 970</td><td>8 524</td><td class="yoy-pos">+9,68%</td><td class="yoy-neg">-41,69%</td></tr>
+              <tr><td>Operating lease liabilities</td><td>46 135</td><td>56 403</td><td>61 086</td><td class="yoy-neg">-18,20%</td><td class="yoy-neg">-7,67%</td></tr>
+              <tr><td>Other long-term liabilities</td><td>4 736</td><td>5 379</td><td>22 208</td><td class="yoy-neg">-11,95%</td><td class="yoy-neg">-75,78%</td></tr>
+              <tr><td>Deferred tax liabilities</td><td>1 926 454</td><td>407</td><td>357</td><td class="yoy-pos">+473230,22%</td><td class="yoy-pos">+14,01%</td></tr>
+              <tr class="total"><td>Total liabilities</td><td>10 598 110</td><td>7 613 701</td><td>2 597 556</td><td class="yoy-pos">+39,20%</td><td class="yoy-pos">+193,11%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Mezzanine Equity & Stockholders' Equity</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead>
+              <tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr>
+            </thead>
+            <tbody>
+              <tr class="section-hdr"><td colspan="6">Mezzanine Equity — Preferred Stock Series</td></tr>
+              <tr><td>10.00 Series A Perpetual Strife Preferred Stock (STRF)</td><td>1 191 128</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Variable Rate Series A Perpetual Stretch Preferred Stock (STRC)</td><td>2 631 281</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>10.00 Series A Perpetual Stream Preferred Stock (STRE)</td><td>707 069</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>8.00% Series A Perpetual Strike Preferred Stock (STRK)</td><td>1 226 553</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                            <tr><td>10.00 Series A Perpetual Stride Preferred Stock (STRD)</td><td>1 163 483</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr class="subtotal"><td>Total mezzanine equity</td><td>6 919 514</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr class="section-hdr"><td colspan="6">Stockholders' Equity</td></tr>
+              <tr><td>Class A common stock</td><td>292</td><td>226</td><td>24</td><td class="yoy-pos">+29,20%</td><td class="yoy-pos">+841,67%</td></tr>
+              <tr><td>Class B common stock</td><td>20</td><td>20</td><td>2</td><td class="yoy-pos">0,00%</td><td class="yoy-pos">+900,00%</td></tr>
+              <tr><td>Additional paid-in capital</td><td>37 806 554</td><td>20 411 998</td><td>3 957 728</td><td class="yoy-pos">+85,22%</td><td class="yoy-pos">+415,75%</td></tr>
+              <tr><td>Treasury stock, at cost</td><td>—</td><td>—</td><td>-782 104</td><td>—</td><td class="yoy-neg">-100,00%</td></tr>
+              <tr><td>Accumulated other comprehensive loss</td><td>-5 171</td><td>-15 384</td><td>-11 444</td><td class="yoy-pos">-66,39%</td><td class="yoy-neg">+34,43%</td></tr>
+              <tr><td>Retained earnings (accumulated deficit)</td><td>-6 321 763</td><td>-2 166 876</td><td>-999 234</td><td class="yoy-neg">-391,75%</td><td class="yoy-neg">+116,85%</td></tr>
+              <tr class="subtotal"><td>Total stockholders' equity</td><td>44 123 458</td><td>18 229 984</td><td>2 164 972</td><td class="yoy-pos">+142,04%</td><td class="yoy-pos">+742,04%</td></tr>
+              <tr class="total"><td>Total liabilities and stockholders' equity</td><td>61 641 082</td><td>25 843 685</td><td>4 762 528</td><td class="yoy-pos">+138,52%</td><td class="yoy-pos">+442,65%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <!-- END PAGE BS -->
+
+
+    <!-- ═══════════ PAGE: INCOME STATEMENT ═══════════ -->
+    <div class="page" id="page-is">
+    <div class="wrap-inner">
+      <div class="page-title">Income Statement</div>
+      <div class="page-sub">Strategy Inc — Consolidated Statements of Operations (in thousands USD, except per share)</div>
+
+      <!-- KPIs -->
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="k">Total Revenues 2025</div><div class="v" style="color:var(--cyan)">$477.2M</div><div class="s">+2,97% YoY</div></div>
+        <div class="kpi"><div class="k">Gross Profit 2025</div><div class="v" style="color:var(--green)">$327.8M</div><div class="s">Margin 68,69%</div></div>
+        <div class="kpi"><div class="k">Net Loss 2025</div><div class="v" style="color:var(--red)">-$3.85B</div><div class="s">Incl. $5.4B unrealised BTC</div></div>
+        <div class="kpi"><div class="k">Adj. Net Income 2025</div><div class="v" style="color:var(--gold)">+$420M</div><div class="s">Excl. BTC impact</div></div>
+      </div>
+
+      <!-- Revenue Table -->
+      <div class="panel">
+        <div class="panel-head"><h2>Revenues</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr class="section-hdr"><td colspan="6">Product & Subscription</td></tr>
+              <tr><td>Product licenses</td><td>39 674</td><td>48 567</td><td>75 351</td><td class="yoy-neg">-18,31%</td><td class="yoy-neg">-35,55%</td></tr>
+              <tr><td>Subscription services</td><td>175 657</td><td>106 776</td><td>81 179</td><td class="yoy-pos">+64,51%</td><td class="yoy-pos">+31,53%</td></tr>
+              <tr class="subtotal"><td>Total product licenses &amp; subscription services</td><td>215 331</td><td>155 343</td><td>156 530</td><td class="yoy-pos">+38,62%</td><td class="yoy-neg">-0,76%</td></tr>
+              <tr><td>Product support</td><td>204 225</td><td>243 805</td><td>263 888</td><td class="yoy-neg">-16,23%</td><td class="yoy-neg">-7,61%</td></tr>
+              <tr><td>Other services</td><td>57 677</td><td>64 308</td><td>75 843</td><td class="yoy-neg">-10,31%</td><td class="yoy-neg">-15,21%</td></tr>
+              <tr class="total"><td>Total revenues</td><td>477 233</td><td>463 456</td><td>496 261</td><td class="yoy-pos">+2,97%</td><td class="yoy-neg">-6,61%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Cost of Revenues -->
+      <div class="panel">
+        <div class="panel-head"><h2>Cost of Revenues</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr><td>Product licenses</td><td>3 956</td><td>3 060</td><td>1 929</td><td class="yoy-pos">+29,28%</td><td class="yoy-pos">+58,63%</td></tr>
+              <tr><td>Subscription services</td><td>72 956</td><td>42 440</td><td>31 776</td><td class="yoy-pos">+71,90%</td><td class="yoy-pos">+33,56%</td></tr>
+              <tr class="subtotal"><td>Total product licenses &amp; subscription services</td><td>76 912</td><td>45 500</td><td>33 705</td><td class="yoy-pos">+69,04%</td><td class="yoy-pos">+34,99%</td></tr>
+              <tr><td>Product support</td><td>28 592</td><td>33 289</td><td>22 434</td><td class="yoy-neg">-14,11%</td><td class="yoy-pos">+48,39%</td></tr>
+              <tr><td>Other services</td><td>43 913</td><td>50 679</td><td>53 805</td><td class="yoy-neg">-13,35%</td><td class="yoy-neg">-5,81%</td></tr>
+              <tr class="total"><td>Total cost of revenues</td><td>149 417</td><td>129 468</td><td>109 944</td><td class="yoy-pos">+15,41%</td><td class="yoy-pos">+17,76%</td></tr>
+              <tr class="subtotal"><td>Gross profit</td><td>327 816</td><td>333 988</td><td>386 317</td><td class="yoy-neg">-1,85%</td><td class="yoy-neg">-13,55%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Operating Expenses & Bottom Line -->
+      <div class="panel">
+        <div class="panel-head"><h2>Operating Expenses & Net (Loss) Income</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr class="section-hdr"><td colspan="6">Operating Expenses</td></tr>
+              <tr><td>Sales and marketing</td><td>122 956</td><td>138 081</td><td>149 671</td><td class="yoy-neg">-10,95%</td><td class="yoy-neg">-7,74%</td></tr>
+              <tr><td>Research and development</td><td>93 860</td><td>118 486</td><td>120 530</td><td class="yoy-neg">-20,78%</td><td class="yoy-neg">-1,70%</td></tr>
+              <tr><td>General and administrative</td><td>151 909</td><td>140 537</td><td>115 312</td><td class="yoy-pos">+8,09%</td><td class="yoy-pos">+21,88%</td></tr>
+              <tr style="color:var(--red)"><td>Unrealized loss on digital assets</td><td>5 403 476</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Digital asset impairment losses (gains on sale), net</td><td>—</td><td>1 789 862</td><td>115 851</td><td class="yoy-neg">-100,00%</td><td class="yoy-pos">+1444,97%</td></tr>
+              <tr class="subtotal"><td>Total operating expenses</td><td>5 772 201</td><td>2 186 966</td><td>501 364</td><td class="yoy-pos">+163,94%</td><td class="yoy-pos">+336,20%</td></tr>
+              <tr class="section-hdr"><td colspan="6">Below the Operating Line</td></tr>
+              <tr><td>Loss from operations</td><td class="neg">-5 444 385</td><td class="neg">-1 852 978</td><td class="neg">-115 047</td><td class="yoy-neg">+193,82%</td><td class="yoy-neg">+1510,63%</td></tr>
+              <tr><td>Interest expense, net</td><td class="neg">-64 968</td><td class="neg">-61 941</td><td class="neg">-48 960</td><td class="yoy-neg">+4,89%</td><td class="yoy-neg">+26,51%</td></tr>
+              <tr><td>(Loss) gain on debt extinguishment</td><td>—</td><td class="neg">-22 933</td><td class="pos">44 686</td><td class="yoy-neg">-100,00%</td><td class="yoy-neg">-151,32%</td></tr>
+              <tr><td>Other (expense) income, net</td><td class="neg">-16 601</td><td class="pos">3 506</td><td class="neg">-5 204</td><td class="yoy-neg">-573,50%</td><td class="yoy-neg">-167,37%</td></tr>
+              <tr class="subtotal"><td>Loss before income taxes</td><td class="neg">-5 525 954</td><td class="neg">-1 934 346</td><td class="neg">-124 525</td><td class="yoy-neg">+185,68%</td><td class="yoy-neg">+1453,38%</td></tr>
+              <tr><td>(Benefit from) provision for income taxes</td><td class="pos">-1 677 802</td><td class="pos">-767 685</td><td class="pos">-553 646</td><td class="yoy-pos">+118,55%</td><td class="yoy-pos">+38,66%</td></tr>
+              <tr class="total"><td>Net (loss) income</td><td class="neg">-3 848 152</td><td class="neg">-1 166 661</td><td class="pos">429 121</td><td class="yoy-neg">+229,84%</td><td class="yoy-neg">-371,87%</td></tr>
+              <tr><td>Dividends on preferred stock</td><td class="neg">-381 367</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr class="total"><td>Net (loss) income attr. to common stockholders</td><td class="neg">-4 229 519</td><td class="neg">-1 166 661</td><td class="pos">429 121</td><td class="yoy-neg">+262,53%</td><td class="yoy-neg">-371,87%</td></tr>
+              <tr class="section-hdr"><td colspan="6">Per Share Data</td></tr>
+              <tr><td>Basic (loss) earnings per share</td><td class="neg">-15,23</td><td class="neg">-6,06</td><td class="pos">3,14</td><td class="yoy-neg">+151,32%</td><td class="yoy-neg">-292,99%</td></tr>
+              <tr><td>Wtd. avg. shares outstanding — Basic</td><td>277 660</td><td>192 549</td><td>136 706</td><td class="yoy-pos">+44,20%</td><td class="yoy-pos">+40,85%</td></tr>
+              <tr><td>Diluted (loss) earnings per share</td><td class="neg">-15,23</td><td class="neg">-6,06</td><td class="pos">2,64</td><td class="yoy-neg">+151,32%</td><td class="yoy-neg">-329,55%</td></tr>
+              <tr><td>Wtd. avg. shares outstanding — Diluted</td><td>277 660</td><td>192 549</td><td>165 662</td><td class="yoy-pos">+44,20%</td><td class="yoy-pos">+16,23%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <!-- END PAGE IS -->
+
+
+
+    <!-- ═══════════ PAGE: CASH FLOW ═══════════ -->
+    <div class="page" id="page-cf">
+    <div class="wrap-inner">
+      <div class="page-title">Cash Flow Statement</div>
+      <div class="page-sub">Strategy Inc — Consolidated Statements of Cash Flows (in thousands USD)</div>
+
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="k">CFO 2025</div><div class="v" style="color:var(--red)">-$67.2M</div><div class="s">vs -$53.0M in 2024</div></div>
+        <div class="kpi"><div class="k">CFI 2025</div><div class="v" style="color:var(--red)">-$22.5B</div><div class="s">BTC purchases dominated</div></div>
+        <div class="kpi"><div class="k">CFF 2025</div><div class="v" style="color:var(--green)">+$24.8B</div><div class="s">Equity &amp; debt raises</div></div>
+        <div class="kpi"><div class="k">Net Δ Cash 2025</div><div class="v" style="color:var(--cyan)">+$2.26B</div><div class="s">End balance $2.30B</div></div>
+      </div>
+
+      <!-- Operating Activities -->
+      <div class="panel">
+        <div class="panel-head"><h2>Operating Activities</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr class="subtotal"><td>Net (loss) income</td><td class="neg">-3 848 152</td><td class="neg">-1 166 661</td><td class="pos">429 121</td><td class="yoy-neg">+229,84%</td><td class="yoy-neg">-371,87%</td></tr>
+              <tr class="section-hdr"><td colspan="6">Adjustments to reconcile net (loss) income to net cash</td></tr>
+              <tr><td>Depreciation and amortization</td><td>25 517</td><td>17 808</td><td>14 527</td><td class="yoy-pos">+43,29%</td><td class="yoy-pos">+22,59%</td></tr>
+              <tr><td>Reduction in carrying amount of right-of-use assets</td><td>9 068</td><td>8 475</td><td>8 643</td><td class="yoy-pos">+7,00%</td><td class="yoy-neg">-1,94%</td></tr>
+              <tr><td>Deferred taxes</td><td class="neg">-1 684 220</td><td class="neg">-775 851</td><td class="neg">-569 455</td><td class="yoy-neg">+117,08%</td><td class="yoy-neg">+36,24%</td></tr>
+              <tr><td>Share-based compensation expense</td><td>53 369</td><td>77 124</td><td>69 571</td><td class="yoy-neg">-30,80%</td><td class="yoy-pos">+10,86%</td></tr>
+              <tr style="color:var(--red)"><td>Unrealized loss on digital assets</td><td>5 403 476</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Digital asset impairment losses</td><td>—</td><td>1 789 862</td><td>115 851</td><td class="yoy-neg">-100,00%</td><td class="yoy-pos">+1444,97%</td></tr>
+              <tr><td>Amortization of issuance costs on long-term debt</td><td>25 410</td><td>15 336</td><td>8 808</td><td class="yoy-pos">+65,69%</td><td class="yoy-pos">+74,11%</td></tr>
+              <tr><td>Other</td><td>3 484</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Loss (gain) on debt extinguishment</td><td>—</td><td class="neg">-22 933</td><td class="pos">44 686</td><td class="yoy-neg">-100,00%</td><td class="yoy-neg">-151,32%</td></tr>
+              <tr class="section-hdr"><td colspan="6">Changes in operating assets and liabilities</td></tr>
+              <tr><td>Accounts receivable</td><td>20 406</td><td>6 337</td><td>11 694</td><td class="yoy-pos">+222,01%</td><td class="yoy-neg">-45,81%</td></tr>
+              <tr><td>Prepaid expenses and other current assets</td><td class="neg">-28 892</td><td>3 804</td><td class="neg">-11 358</td><td class="yoy-neg">-859,52%</td><td class="yoy-neg">-133,49%</td></tr>
+              <tr><td>Deposits and other assets</td><td>10 980</td><td class="neg">-10 668</td><td class="neg">-632</td><td class="yoy-neg">-202,92%</td><td class="yoy-neg">+1587,97%</td></tr>
+              <tr><td>Accounts payable and accrued expenses</td><td>6 561</td><td>1 141</td><td>634</td><td class="yoy-pos">+475,02%</td><td class="yoy-neg">-279,97%</td></tr>
+              <tr><td>Accrued compensation and employee benefits</td><td class="neg">-46 593</td><td class="neg">-34 563</td><td class="neg">-12 000</td><td class="yoy-neg">+34,81%</td><td class="yoy-neg">+188,03%</td></tr>
+              <tr><td>Accrued interest</td><td>70</td><td>4 193</td><td class="neg">-1 336</td><td class="yoy-neg">-98,33%</td><td class="yoy-neg">-413,85%</td></tr>
+              <tr><td>Deferred revenue and advance payments</td><td class="neg">-7 966</td><td>1 049</td><td>2 362</td><td class="yoy-neg">-859,39%</td><td class="yoy-neg">-55,59%</td></tr>
+              <tr><td>Operating lease liabilities</td><td class="neg">-10 662</td><td class="neg">-10 510</td><td class="neg">-10 218</td><td class="yoy-neg">+1,45%</td><td class="yoy-neg">+2,86%</td></tr>
+              <tr><td>Other long-term liabilities</td><td class="neg">-903</td><td class="neg">-2 841</td><td>2 454</td><td class="yoy-pos">-131,78%</td><td class="yoy-neg">-215,77%</td></tr>
+              <tr class="total"><td>Net cash (used in) provided by operating activities</td><td class="neg">-67 241</td><td class="neg">-53 032</td><td class="pos">12 712</td><td class="yoy-neg">+26,79%</td><td class="yoy-neg">-517,18%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Investing Activities -->
+      <div class="panel">
+        <div class="panel-head"><h2>Investing Activities</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr style="color:var(--gold)"><td>Purchases of digital assets</td><td class="neg">-22 467 083</td><td class="neg">-22 072 759</td><td class="neg">-1 902 299</td><td class="yoy-neg">+1,79%</td><td class="yoy-neg">+1060,32%</td></tr>
+              <tr><td>Proceeds from sale of digital assets</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Advance deposits on purchases of property and equipment</td><td class="neg">-37 000</td><td class="neg">-10 500</td><td>—</td><td class="yoy-neg">+252,38%</td><td>—</td></tr>
+              <tr><td>Purchases of property and equipment</td><td class="neg">-8 212</td><td class="neg">-2 978</td><td class="neg">-2 938</td><td class="yoy-neg">+175,76%</td><td class="yoy-neg">+1,36%</td></tr>
+              <tr class="total"><td>Net cash used in investing activities</td><td class="neg">-22 512 295</td><td class="neg">-22 086 237</td><td class="neg">-1 905 237</td><td class="yoy-neg">+1,93%</td><td class="yoy-neg">+1059,24%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Financing Activities -->
+      <div class="panel">
+        <div class="panel-head"><h2>Financing Activities</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr><td>Proceeds from convertible senior notes</td><td>2 000 000</td><td>6 213 750</td><td>—</td><td class="yoy-neg">-67,81%</td><td>—</td></tr>
+              <tr><td>Issuance costs paid for convertible senior notes</td><td class="neg">-15 178</td><td class="neg">-81 033</td><td>—</td><td class="yoy-pos">-81,27%</td><td>—</td></tr>
+              <tr><td>Payments to settle conversions and redemption of convertible notes</td><td class="neg">-143</td><td class="neg">-398</td><td>—</td><td class="yoy-pos">-64,07%</td><td>—</td></tr>
+              <tr><td>Repayments of secured debt and third-party extinguishment costs</td><td>—</td><td class="neg">-515 414</td><td class="neg">-160 033</td><td class="yoy-pos">-100,00%</td><td class="yoy-neg">+222,07%</td></tr>
+              <tr><td>Proceeds from other long-term secured debt, net of lender fees</td><td>31 000</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Principal payments of other long-term secured debt</td><td class="neg">-569</td><td class="neg">-539</td><td class="neg">-513</td><td class="yoy-neg">+5,57%</td><td class="yoy-neg">+5,07%</td></tr>
+              <tr style="color:var(--gold)"><td>Proceeds from sale of preferred stock under public offerings</td><td>7 036 110</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Issuance costs paid — preferred stock</td><td class="neg">-120 802</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Dividends paid on preferred stock</td><td class="neg">-381 367</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Proceeds from sale of common stock under public offerings</td><td>16 271 959</td><td>16 363 023</td><td>2 029 214</td><td class="yoy-neg">-0,56%</td><td class="yoy-pos">+706,37%</td></tr>
+              <tr><td>Issuance costs paid — common stock</td><td class="neg">-25 072</td><td class="neg">-33 166</td><td class="neg">-9 141</td><td class="yoy-pos">-24,40%</td><td class="yoy-neg">+262,83%</td></tr>
+              <tr><td>Proceeds from exercise of stock options</td><td>42 154</td><td>184 287</td><td>30 518</td><td class="yoy-neg">-77,13%</td><td class="yoy-pos">+503,86%</td></tr>
+              <tr><td>Proceeds from sales under employee stock purchase plan</td><td>5 435</td><td>4 304</td><td>3 955</td><td class="yoy-pos">+26,28%</td><td class="yoy-pos">+8,82%</td></tr>
+              <tr><td>Payment of withholding tax on vesting of RSUs</td><td>—</td><td class="neg">-2 173</td><td class="neg">-4 114</td><td class="yoy-pos">-100,00%</td><td class="yoy-pos">-47,18%</td></tr>
+              <tr class="total"><td>Net cash used in financing activities</td><td class="pos">24 843 527</td><td class="pos">22 132 641</td><td class="pos">1 889 886</td><td class="yoy-pos">+12,25%</td><td class="yoy-pos">+1071,11%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="panel">
+        <div class="panel-head"><h2>Cash Summary</h2><span>USD thousands</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th><th>2025 vs 2024</th><th>2024 vs 2023</th></tr></thead>
+            <tbody>
+              <tr><td>Effect of FX rate changes on cash</td><td class="neg">-544</td><td class="neg">-2 148</td><td>444</td><td class="yoy-pos">-74,67%</td><td class="yoy-neg">-583,78%</td></tr>
+              <tr class="subtotal"><td>Net increase (decrease) in cash &amp; restricted cash</td><td class="pos">2 263 447</td><td class="neg">-8 776</td><td class="neg">-2 195</td><td class="yoy-neg">-25891,33%</td><td class="yoy-neg">+299,82%</td></tr>
+              <tr><td>Cash, cash equivalents &amp; restricted cash, beginning of year</td><td>39 897</td><td>48 673</td><td>50 868</td><td class="yoy-neg">-18,03%</td><td class="yoy-neg">-4,32%</td></tr>
+              <tr class="total"><td>Cash, cash equivalents &amp; restricted cash, end of year</td><td class="pos">2 303 344</td><td>39 897</td><td>48 673</td><td class="yoy-pos">+5673,23%</td><td class="yoy-neg">-18,03%</td></tr>
+              <tr class="section-hdr"><td colspan="6">Supplemental Disclosures</td></tr>
+              <tr><td>Cash paid for interest</td><td>46 525</td><td>44 571</td><td>41 229</td><td class="yoy-pos">+4,38%</td><td class="yoy-pos">+8,11%</td></tr>
+              <tr><td>Cash paid for income taxes, net of refunds</td><td>13 132</td><td>1 059</td><td>30 318</td><td class="yoy-pos">+1140,04%</td><td class="yoy-neg">-96,51%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <!-- END PAGE CF -->
+
+
+
+    <!-- ═══════════ PAGE: RATIOS ═══════════ -->
+    <div class="page" id="page-ratios">
+    <div class="wrap-inner">
+      <div class="page-title">Financial Ratios</div>
+      <div class="page-sub">Strategy Inc — 2025 / 2024 / 2023 — Valores em destaque laranja: influência directa do BTC</div>
+
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><div class="k">Gross Margin 2025</div><div class="v" style="color:var(--green)">68,69%</div><div class="s">Software business sólido</div></div>
+        <div class="kpi"><div class="k">Adj. ROE 2025</div><div class="v" style="color:var(--cyan)">0,13%</div><div class="s">Excl. BTC impact</div></div>
+        <div class="kpi"><div class="k">mNAV 2025</div><div class="v" style="color:var(--gold)">1,23×</div><div class="s">vs 2,36× em 2024</div></div>
+        <div class="kpi"><div class="k">BTC Yield 2025</div><div class="v" style="color:var(--green)">+22,77%</div><div class="s">BPS: crescimento posit.</div></div>
+      </div>
+
+      <!-- Profitability -->
+      <div class="panel">
+        <div class="panel-head"><h2>Profitability</h2><span>Rentabilidade operacional e total</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th></tr></thead>
+            <tbody>
+              <tr style="color:var(--accent)"><td>ROE = Net Income / Avg. Shareholders' Equity (With BTC)</td><td class="neg">-13,57%</td><td class="neg">-11,44%</td><td class="pos">48,17%</td></tr>
+              <tr><td>Adjusted ROE = Adj. Net Income / Avg. Equity (Without BTC)</td><td class="pos">0,13%</td><td class="pos">2,43%</td><td class="pos">58,44%</td></tr>
+              <tr style="color:var(--accent)"><td>ROA = Net Income / Total Assets (With BTC)</td><td class="neg">-6,24%</td><td class="neg">-4,51%</td><td class="pos">9,01%</td></tr>
+              <tr><td>Adjusted ROA = Adj. Net Income / Total Assets (Without BTC)</td><td class="pos">15,09%</td><td class="pos">12,79%</td><td class="pos">45,83%</td></tr>
+              <tr><td>Adjusted ROIC = Adj. EBIT×(1−Tax Rate) / Invested Capital (Without BTC)</td><td class="pos">0,46%</td><td class="neg">-4,28%</td><td class="pos">0,12%</td></tr>
+              <tr><td>Gross Margin = Gross Profit / Total Revenues</td><td class="pos">68,69%</td><td class="pos">72,06%</td><td class="pos">77,85%</td></tr>
+              <tr><td>Adjusted Operating Margin = EBIT excl. BTC / Total Revenues</td><td class="neg">-8,57%</td><td class="neg">-13,62%</td><td class="pos">0,16%</td></tr>
+              <tr style="color:var(--accent)"><td>Net Profit Margin = Net Income / Total Revenues (With BTC)</td><td class="neg">-806,35%</td><td class="neg">-251,73%</td><td class="pos">86,47%</td></tr>
+              <tr><td>Adjusted Net Profit Margin = Adj. Net Income / Total Revenues (Without BTC)</td><td class="pos">88,13%</td><td class="pos">53,37%</td><td class="pos">104,91%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Liquidity & Solvency -->
+      <div class="panel">
+        <div class="panel-head"><h2>Liquidity &amp; Solvency</h2><span>Estrutura de capital e cobertura</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th></tr></thead>
+            <tbody>
+              <tr><td>Current Ratio = Current Assets / Current Liabilities (Don't affected by BTC)</td><td class="pos">5,62</td><td class="neg">0,71</td><td class="neg">0,83</td></tr>
+              <tr><td>Debt/Equity Ratio = Total Debt / Shareholders' Equity</td><td class="pos">0,18</td><td class="neg">0,39</td><td class="neg">1,01</td></tr>
+              <tr style="color:var(--accent)"><td>Equity Ratio = Shareholders' Equity / Total Assets (With BTC)</td><td>71,58%</td><td>70,54%</td><td>45,46%</td></tr>
+              <tr><td>Adjusted Equity Ratio = Shareholders' Equity / Total Assets (Without BTC)</td><td class="neg">-528,54%</td><td class="neg">-293,61%</td><td class="neg">-128,65%</td></tr>
+              <tr style="color:var(--accent)"><td>Debt Ratio = Total Liabilities / Total Assets (With BTC)</td><td>17,19%</td><td>29,46%</td><td>54,54%</td></tr>
+              <tr><td>Adjusted Debt Ratio = Total Liabilities / Total Assets Adjusted</td><td class="neg">380,26%</td><td class="neg">393,61%</td><td class="neg">228,65%</td></tr>
+              <tr style="color:var(--accent)"><td>Mezzanine Ratio = Total Mezzanine Equity / Total Assets</td><td>11,23%</td><td>N/A</td><td>N/A</td></tr>
+              <tr style="color:var(--accent)"><td>Free Cash Flow to Equity STD (With BTC)</td><td class="neg">—</td><td class="pos">1 833 955</td><td class="pos">4 429 600</td></tr>
+              <tr><td>Free Cash Flow to Equity Adjusted (Without BTC)</td><td class="pos">1 885 301</td><td class="neg">-5 443 611</td><td class="neg">-193 116</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Debt Coverage -->
+      <div class="panel">
+        <div class="panel-head"><h2>Debt Coverage &amp; Capital Structure</h2><span>Cobertura de dívida</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th></tr></thead>
+            <tbody>
+              <tr><td>Interest Coverage Ratio = Adj. EBIT / Net Interest Expense (Without BTC)</td><td class="neg">-0,63</td><td class="neg">-1,02</td><td class="pos">0,02</td></tr>
+              <tr><td>Asset Coverage Ratio STD = ((Total Assets − Digital Assets) − (CL − Current LTD)) / Total Debt</td><td class="pos">0,29</td><td class="pos">0,22</td><td class="pos">0,37</td></tr>
+              <tr style="color:var(--accent)"><td>Asset Coverage Ratio (With BTC) = (Total Assets − (CL − Current LTD)) / Total Debt</td><td class="pos">7,47</td><td class="pos">3,54</td><td class="pos">2,03</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bitcoin-Specific -->
+      <div class="panel">
+        <div class="panel-head" style="border-color:rgba(240,185,11,.4)"><h2 style="color:var(--gold)">Bitcoin Treasury Ratios</h2><span>Métricas específicas da estratégia BTC</span></div>
+        <div class="tbl-wrap">
+          <table class="fin">
+            <thead><tr><th>Description</th><th>2025</th><th>2024</th><th>2023</th></tr></thead>
+            <tbody>
+              <tr style="color:var(--gold)"><td>BTC as % of Total Assets = BTC Carrying Value / Total Assets</td><td>95,48%</td><td>92,52%</td><td>76,15%</td></tr>
+              <tr style="color:var(--gold)"><td>Debt / BTC Value = Total Debt / BTC Carrying Value</td><td>0,14</td><td>0,30</td><td>0,60</td></tr>
+              <tr style="color:var(--gold)"><td>mNAV</td><td>1,23</td><td>2,36</td><td>2,24</td></tr>
+              <tr style="color:var(--gold)"><td>BTC Yield = (BPS end − BPS initial) / BPS initial × 100</td><td class="pos">22,77%</td><td class="pos">74,35%</td><td class="neg">-51,50%</td></tr>
+              <tr style="color:var(--gold)"><td>BTC Acquisition Cost vs. Fair Value (Unrealised Gain)</td><td>8 418 506 500</td><td>13 820 975 300</td><td>2 149 249 650</td></tr>
+              <tr style="color:var(--gold)"><td>BTC Acquisition Cost vs. Fair Value (Premium)</td><td>1,17</td><td>1,49</td><td>1,36</td></tr>
+              <tr style="color:var(--gold)"><td>BTC Acquisition Cost vs. Fair Value (Margin of Safety)</td><td>14,30%</td><td>33,07%</td><td>26,72%</td></tr>
+              <tr class="section-hdr"><td colspan="4">Growth</td></tr>
+              <tr><td>Revenue Growth Rate</td><td class="pos">2,97%</td><td class="neg">-6,61%</td><td class="neg">-0,60%</td></tr>
+              <tr><td>Subscription Services Growth Rate</td><td class="pos">36,81%</td><td class="pos">23,04%</td><td class="pos">16,36%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    </div>
+    <!-- END PAGE RATIOS -->
+
+
+    <!-- ═══════════ PAGE: SWOT ═══════════ -->
+    <div class="page" id="page-swot">
+    <div class="wrap-inner">
+      <div class="page-title">Análise SWOT</div>
+      <div class="page-sub">Strategy Inc — Pontos fortes, fraquezas, oportunidades e ameaças estratégicas</div>
+
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+        <div class="kpi"><div class="k">Forças</div><div class="v" style="color:var(--green)">6</div><div class="s">Vantagens estruturais</div></div>
+        <div class="kpi"><div class="k">Fraquezas</div><div class="v" style="color:var(--red)">6</div><div class="s">Riscos internos</div></div>
+        <div class="kpi"><div class="k">Oportunidades</div><div class="v" style="color:var(--cyan)">5</div><div class="s">Vectores de crescimento</div></div>
+        <div class="kpi"><div class="k">Ameaças</div><div class="v" style="color:var(--gold)">5</div><div class="s">Pressões externas</div></div>
+      </div>
+
+      <div class="swot-grid">
+        <!-- FORÇAS -->
+        <div class="swot-cell sw-s">
+          <h3>Forças (Strengths)</h3>
+          <ul>
+            <li>Primeira e maior Bitcoin Treasury Company do mundo com 672.500 BTC e valor justo de $58,9 B em dezembro de 2025, conferindo uma vantagem de escala e marca sem precedentes.</li>
+            <li>Estratégia de mercados de capitais inovadora: portfólio diversificado de instrumentos (ações preferenciais STRF, STRC, STRE, STRK, STRD e notas convertíveis) que atrai diferentes perfis de investidores.</li>
+            <li>Plataforma de analytics empresarial líder com capacidades generativas de IA (Strategy One), servindo sectores como banca, retalho, saúde e sector público.</li>
+            <li>USD Reserve de $2,25 B estabelecida em dezembro de 2025 para cobrir dividendos e juros, reforçando a resiliência do balanço.</li>
+            <li>Custódia diversificada com Coinbase (40%), Anchorage (37%) e Fidelity (23%), mitigando riscos de concentração.</li>
+            <li>Crescimento das subscrições cloud (+64,5% em 2025), demonstrando o sucesso da migração digital do negócio de software.</li>
+          </ul>
+        </div>
+        <!-- FRAQUEZAS -->
+        <div class="swot-cell sw-w">
+          <h3>Fraquezas (Weaknesses)</h3>
+          <ul>
+            <li>Concentração extrema em Bitcoin: o ativo constitui a vasta maioria do balanço; a falta de diversificação amplifica todos os riscos.</li>
+            <li>Resultados líquidos negativos recorrentes: perda de $1,17 B em 2024 e de $3,85 B em 2025, embora maioritariamente não realizadas.</li>
+            <li>Endividamento elevado e obrigações preferenciais: $8,25 B em dívida + $8,47 B em valor nominal de ações preferenciais, com encargos fixos de $36,2 M anuais em juros.</li>
+            <li>Risco de pessoa-chave: Michael J. Saylor controla a maioria do poder de voto através de ações classe B, limitando a influência dos restantes acionistas.</li>
+            <li>BTC Yield em declínio de 74,3% (2024) para 22,8% (2025), reflectindo o aumento da base e das emissões dilutivas.</li>
+            <li>Cobertura de seguro irrisória face às holdings: apenas ~$520 M de cobertura combinada dos custódios para um portfolio de $58,9 B.</li>
+          </ul>
+        </div>
+        <!-- OPORTUNIDADES -->
+        <div class="swot-cell sw-o">
+          <h3>Oportunidades (Opportunities)</h3>
+          <ul>
+            <li>Ambiente regulatório favorável nos EUA: Ordem Executiva de Trump de 23 de janeiro de 2025 sobre Digital Financial Technology e exploração de uma Reserva Estratégica de Bitcoin.</li>
+            <li>Adoção institucional crescente de Bitcoin: os ETPs spot aprovados pela SEC acumularam mais de 1,3 M de BTC desde janeiro de 2024, demonstrando procura robusta.</li>
+            <li>Integração de IA no produto de analytics: a Strategy One com capacidades generativas de IA posiciona a empresa para capturar crescimento no mercado de BI empresarial.</li>
+            <li>Inovação em produtos Bitcoin-nativos: potencial de criar fluxos de receita adicionais a partir das holdings de BTC (empréstimos, estratégias de rendimento).</li>
+            <li>Consolidação do mercado de analytics: declínio de competidores de nicho abre oportunidade de ganhar quota de mercado enterprise.</li>
+          </ul>
+        </div>
+        <!-- AMEAÇAS -->
+        <div class="swot-cell sw-t">
+          <h3>Ameaças (Threats)</h3>
+          <ul>
+            <li>Volatilidade extrema do Bitcoin: em 2025, o preço oscilou entre menos de $65.000 e mais de $120.000, gerando perdas não realizadas de $5,4 B num único ano.</li>
+            <li>Competição de ETPs de Bitcoin: o fundo BlackRock, Fidelity e outros oferecem exposição pura a Bitcoin sem os riscos operacionais de uma empresa pública.</li>
+            <li>Risco cibernético e de custódia: ataques sofisticados (incluindo os impulsionados por IA) e o potencial computador quântico ameaçam a segurança criptográfica.</li>
+            <li>Competição no mercado de analytics: Microsoft Power BI, Google Looker, Salesforce Tableau e Qlik exercem pressão competitiva crescente.</li>
+            <li>Adoção de estratégias similares por terceiros: empresas como MARA, Metaplanet e Semler Scientific adoptaram estratégias de tesouraria em Bitcoin, diluindo a unicidade da proposta de valor.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </div>
+
+
+    <!-- ═══════════ PAGE: PESTEL ═══════════ -->
+    <div class="page" id="page-pestel">
+    <div class="wrap-inner">
+      <div class="page-title">Análise PESTEL</div>
+      <div class="page-sub">Strategy Inc — Factores macro-ambientais com impacto estratégico</div>
+
+      <div class="pestel-grid">
+
+        <!-- P -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(255,100,20,.2);color:var(--accent)">P</div>
+            <div><div class="pestel-title">Político</div><div class="pestel-sub">Regulação cripto, política monetária e relações EUA</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Exposição elevada à política monetária e regulatória dos EUA, porque grande parte do valor da empresa está ligada ao Bitcoin, ativo altamente sensível a decisões da Reserva Federal e posicionamentos de governos sobre criptoativos.</p>
+            <p>Maior escrutínio de entidades reguladoras como a SEC sobre atividades relacionadas a criptomoedas.</p>
+            <p>Regulação internacional fragmentada em cripto e proteção de dados pode dificultar expansão harmonizada para alguns mercados (UE, Ásia), exigindo adaptações locais.</p>
+            <p>Em 23 de janeiro de 2025, o Presidente Trump assinou a Ordem Executiva <em>"Strengthening American Leadership in Digital Financial Technology"</em>, que estabeleceu um grupo de trabalho federal sobre mercados de ativos digitais no âmbito do Conselho Económico Nacional, com o objectivo de reformular o quadro regulatório cripto nos EUA; este grupo publicou as suas recomendações em 30 de julho de 2025.</p>
+            <p>A SEC criou uma Crypto Task Force em 2025, encarregada de clarificar as fronteiras regulatórias entre valores mobiliários e não-valores mobiliários no domínio digital, cujo trabalho se encontra em fase inicial.</p>
+            <p>O GENIUS Act (Guiding and Establishing National Innovation for US Stablecoins Act), que regula as stablecoins de pagamento, foi assinado como lei em julho de 2025, constituindo um marco regulatório concreto para o sector.</p>
+          </div>
+        </div>
+
+        <!-- E -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(25,195,125,.2);color:var(--green)">E</div>
+            <div><div class="pestel-title">Económico</div><div class="pestel-sub">Ciclos macro, taxas de juro e estrutura de capital</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Receita principal vem de software de business intelligence e serviços associados, que sofrem com ciclos económicos onde períodos de incerteza ou recessão tendem a reduzir ou adiar investimentos corporativos.</p>
+            <p>A forte alavancagem financeira (dívida relevante utilizada para acumular Bitcoin) torna a estrutura de capital sensível a taxas de juro e a correções mais fortes no preço do BTC, afetando balanço, rácios de solvência e capacidade de financiar crescimento futuro.</p>
+            <p>Volatilidade elevada na cotação das ações, em grande parte ligada ao preço do Bitcoin, pode dificultar planeamento de longo prazo, emissão de ações e retenção de investidores de perfil mais conservador.</p>
+            <p>Em 2025, a Strategy emitiu cinco classes de ações preferenciais (STRF, STRC, STRE, STRK, STRD), designadas colectivamente como "digital credit", que representam uma nova estrutura de capital com obrigações fixas de dividendos. Em dezembro de 2025, foi constituída uma USD Reserve de $2,25 mil milhões de dólares para suportar o pagamento desses dividendos e dos juros da dívida.</p>
+            <p>A adoção da norma contabilística ASU 2023-08 em 1 de janeiro de 2025 passou a exigir a mensuração das detenções de Bitcoin a justo valor, com ganhos e perdas reconhecidos na demonstração de resultados em cada período, o que introduz uma volatilidade contabilística estrutural significativa. Em 2025, a perda não realizada em ativos digitais ascendeu a $5,4 mil milhões de dólares.</p>
+          </div>
+        </div>
+
+        <!-- S -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(45,198,255,.2);color:var(--cyan)">S</div>
+            <div><div class="pestel-title">Social</div><div class="pestel-sub">Percepção pública, adopção tech e talento</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Adoção crescente de decisões baseadas em dados (data-driven) em organizações de todos os portes favorece soluções de BI e analytics corporativos, núcleo histórico da Strategy.</p>
+            <p>Perceção pública e institucional sobre criptomoedas: enquanto parte do mercado vê Bitcoin como reserva de valor e inovação, outra parte associa cripto a risco especulativo, o que pode afetar reputação e apetite de alguns clientes em setores regulados.</p>
+          </div>
+        </div>
+
+        <!-- T -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(192,132,252,.2);color:#c084fc">T</div>
+            <div><div class="pestel-title">Tecnológico</div><div class="pestel-sub">IA, blockchain, cloud e cibersegurança</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Mercado de analytics, BI e data platforms é altamente competitivo, com grandes players (p. ex. ferramentas cloud-nativas integradas em hyperscalers) a pressionar preços, inovação e integração nativa com ecossistemas cloud.</p>
+            <p>Aposta em blockchain e integração com Bitcoin diferencia a Strategy de concorrentes puramente de software, mas também a força a acompanhar rapidamente evolução de tecnologias de segurança, custódia, smart contracts e infraestrutura de pagamento.</p>
+            <p>Em 2025, a Strategy lançou o Strategy Mosaic, uma plataforma de camada de dados universal (universal data layer) que permite às organizações obter uma única fonte de verdade transversal às suas fontes de dados, com modelação de dados por IA e arquitetura de alto desempenho, representando uma expansão significativa do portfolio tecnológico para além do Strategy One.</p>
+            <p>As licenças on-premises entraram em ciclo de fim de suporte em janeiro de 2025, com suporte total a terminar em 31 de dezembro de 2026, sinalizando a conclusão da transição estratégica para um modelo integralmente cloud-nativo.</p>
+          </div>
+        </div>
+
+        <!-- A -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(255,200,20,.2);color:#ffc814">A</div>
+            <div><div class="pestel-title">Ambiental</div><div class="pestel-sub">ESG, consumo energético e pegada de carbono</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Pressão crescente sobre consumo energético de data centers e infraestruturas de IT leva clientes e reguladores a exigir maior eficiência energética, uso de energia renovável e relatórios ESG.</p>
+            <p>Debates sobre pegada de carbono associada ao Bitcoin relativamente à mineração podem afetar a perceção ambiental quando uma empresa liga tanto o seu posicionamento estratégico ao criptoativo.</p>
+          </div>
+        </div>
+
+        <!-- L -->
+        <div class="pestel-card">
+          <div class="pestel-header">
+            <div class="pestel-letter" style="background:rgba(255,77,109,.2);color:var(--red)">L</div>
+            <div><div class="pestel-title">Legal</div><div class="pestel-sub">Valores mobiliários, GDPR, CAMT e compliance</div></div>
+          </div>
+          <div class="pestel-body">
+            <p>Regras de valores mobiliários e contabilidade para criptoativos impactam diretamente demonstrações financeiras da Strategy e podem alterar indicadores-chave usados por investidores.</p>
+            <p>Legislação de proteção de dados, como GDPR na Europa e leis semelhantes noutros mercados, afetam produtos de BI que operam com grandes volumes de dados de clientes e é necessário garantir funcionalidades de anonimização, controlo de acesso e conformidade em todas as regiões.</p>
+            <p>Reforço de normas de cibersegurança e de reporte de incidentes obriga a investimentos contínuos em segurança de software e infraestrutura, sob risco de sanções, processos e danos reputacionais em caso de falhas.</p>
+            <p>O GENIUS Act e a Digital Asset Market Clarity Act of 2025 introduzem novos quadros legais para stablecoins e commodities digitais, com impacto directo sobre o enquadramento regulatório das actividades de Bitcoin da Strategy.</p>
+            <p>A adoção da ASU 2023-08 e a consequente inclusão de ganhos não realizados em Bitcoin no rendimento financeiro reportado expõem a empresa ao Corporate Alternative Minimum Tax (CAMT) de 15%, previsto na Inflation Reduction Act de 2022, potencialmente a partir do ano fiscal de 2026, podendo gerar uma obrigação fiscal material a liquidar em numerário.</p>
+            <p>A SEC Crypto Task Force, criada em 2025, encontra-se a rever os limites entre ativos digitais que constituem valores mobiliários e aqueles que não constituem, o que pode alterar significativamente o enquadramento legal da actividade de Bitcoin da Strategy.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+
+
+    <!-- ═══════════ PAGE: 5 FORÇAS PORTER ═══════════ -->
+    <div class="page" id="page-porter">
+    <div class="wrap-inner">
+      <div class="page-title">5 Forças de Porter</div>
+      <div class="page-sub">Strategy Inc — Análise da atractividade e dinâmica competitiva do sector</div>
+
+      <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:18px">
+        <div class="kpi"><div class="k">Rivalidade</div><div class="v" style="color:var(--red);font-size:.95rem">Elevada</div></div>
+        <div class="kpi"><div class="k">Novas Entradas</div><div class="v" style="color:var(--gold);font-size:.95rem">Mod.–Elev.</div></div>
+        <div class="kpi"><div class="k">Substitutos</div><div class="v" style="color:var(--gold);font-size:.95rem">Mod.–Elev.</div></div>
+        <div class="kpi"><div class="k">Fornecedores</div><div class="v" style="color:var(--gold);font-size:.95rem">Mod.–Elev.</div></div>
+        <div class="kpi"><div class="k">Clientes</div><div class="v" style="color:var(--gold);font-size:.95rem">Mod.–Elev.</div></div>
+      </div>
+
+      <div class="porter-grid">
+
+        <!-- 1 Rivalidade -->
+        <div class="porter-card center">
+          <div class="porter-head">
+            <h3>1 — Rivalidade entre Concorrentes</h3>
+            <span class="porter-badge badge-high">Elevada</span>
+          </div>
+          <div class="porter-body">
+            <p>O mercado de enterprise analytics e inteligência artificial empresarial caracteriza-se por uma rivalidade intensa e estruturalmente estável, dado o elevado número de operadores com escala global, a rápida evolução tecnológica e a dificuldade crescente de diferenciação de produto. A Strategy concorre directamente com líderes de mercado consolidados, nomeadamente IBM, Microsoft, Oracle, Salesforce e SAP, cujos recursos financeiros, carteiras de clientes e capacidades de integração de inteligência artificial superam consideravelmente os da empresa.</p>
+            <p>A esta dimensão acresce a pressão competitiva no segmento de activos digitais, onde a empresa disputa o acesso a capital com ETPs de Bitcoin spot, miners, exchanges digitais, fundos privados e, de forma crescentemente significativa, com instituições financeiras tradicionais que entraram no mercado de activos digitais após 2024.</p>
+            <div class="porter-meter">
+              <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
+              <div class="porter-bar"><div class="porter-bar-fill" style="width:88%;background:var(--red)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Novas entradas -->
+        <div class="porter-card">
+          <div class="porter-head">
+            <h3>2 — Ameaça de Novas Entradas</h3>
+            <span class="porter-badge badge-med">Moderada a Elevada</span>
+          </div>
+          <div class="porter-body">
+            <p>No segmento de software empresarial, as barreiras à entrada são estruturalmente elevadas: exigem investimento substancial em I&D, necessidade de certificações de segurança exigentes (designadamente a acreditação FedRAMP, indispensável para operar junto de clientes governamentais nos EUA), e da consolidação de ecossistemas de parceiros estratégicos com fornecedores de infraestrutura cloud como AWS, Microsoft e Google.</p>
+            <p>No domínio dos activos digitais, as barreiras estruturais têm vindo a diminuir de forma assinalável: a aprovação pela SEC de ETPs de Bitcoin spot em janeiro de 2024 democratizou o acesso dos investidores institucionais e individuais ao Bitcoin através de estruturas de investimento convencionais, introduzindo novos veículos competitivos que desafiam a proposta de valor da Strategy como veículo privilegiado de exposição ao activo.</p>
+            <p>O 10-K de 2025 documenta explicitamente que a crescente adopção de estratégias de acumulação de Bitcoin por outras empresas representa um vector de pressão adicional sobre a disponibilidade e o custo de financiamento.</p>
+            <div class="porter-meter">
+              <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
+              <div class="porter-bar"><div class="porter-bar-fill" style="width:65%;background:var(--gold)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Substitutos -->
+        <div class="porter-card">
+          <div class="porter-head">
+            <h3>3 — Ameaça de Produtos Substitutos</h3>
+            <span class="porter-badge badge-med">Moderada a Elevada</span>
+          </div>
+          <div class="porter-body">
+            <p>A principal ameaça de substituição no segmento de software provém da proliferação de ferramentas de analytics e BI integradas nativamente em plataformas cloud generalistas, como o Microsoft Power BI ou o Salesforce Analytics, que reduzem a necessidade de uma solução de Business Intelligence dedicada e autónoma.</p>
+            <p>Esta ameaça adquire particular acuidade no contexto actual, uma vez que a Strategy descontinuou activamente a comercialização de novas licenças perpétuas on-premises em janeiro de 2025, com o suporte total a terminar em 31 de dezembro de 2026. Esta transição estrutural cria uma janela temporal crítica durante a qual os clientes são confrontados com uma decisão activa de migração tecnológica, podendo optar por soluções concorrentes em detrimento da plataforma cloud da empresa, um risco de substituição que o próprio 10-K de 2025 identifica expressamente como susceptível de elevar as taxas de churn durante o período de transição.</p>
+            <div class="porter-meter">
+              <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
+              <div class="porter-bar"><div class="porter-bar-fill" style="width:62%;background:var(--gold)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Fornecedores -->
+        <div class="porter-card">
+          <div class="porter-head">
+            <h3>4 — Poder de Negociação dos Fornecedores</h3>
+            <span class="porter-badge badge-med">Moderada a Elevada</span>
+          </div>
+          <div class="porter-body">
+            <p>A Strategy apresenta uma dependência estrutural de dois grupos de fornecedores críticos: os hiperescaladores de infraestrutura cloud — AWS, Microsoft Azure e Google Cloud — que suportam a operacionalidade da plataforma Strategy One; e os prestadores de serviços de custódia institucional de Bitcoin (Coinbase, Anchorage e Fidelity), responsáveis pela salvaguarda dos activos digitais da empresa.</p>
+            <p>Embora a empresa tenha estabelecido parcerias diversificadas com vista a mitigar a concentração de risco, a natureza especializada destes mercados confere a esses fornecedores um poder de negociação considerável.</p>
+            <p>O 10-K de 2025 nota que, na medida em que um número crescente de empresas adopta estratégias de Bitcoin análogas à Strategy, os prestadores de serviços de custódia e de execução poderão enfrentar uma procura acrescida, com potenciais repercussões negativas sobre a qualidade do serviço prestado e as condições contratuais negociáveis.</p>
+            <div class="porter-meter">
+              <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
+              <div class="porter-bar"><div class="porter-bar-fill" style="width:60%;background:var(--gold)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 Clientes -->
+        <div class="porter-card">
+          <div class="porter-head">
+            <h3>5 — Poder de Negociação dos Clientes</h3>
+            <span class="porter-badge badge-med">Moderada a Elevada</span>
+          </div>
+          <div class="porter-body">
+            <p>A carteira de clientes da Strategy abrange grandes empresas globais e entidades do sector público em múltiplas indústrias, incluindo retalho, banca, tecnologia, seguros, saúde e telecomunicações. Os contratos com entidades governamentais estão sujeitos a procedimentos de aquisição rigorosos, restrições orçamentais cíclicas e direitos de rescisão unilateral por conveniência, o que amplifica materialmente o poder negocial deste segmento.</p>
+            <p>A transição do modelo de licenciamento perpétuo para o modelo de subscrição cloud tem, adicionalmente, o efeito estrutural de reduzir os custos de mudança (switching costs) para os clientes, facilitando tecnicamente a migração para plataformas concorrentes e potenciando as taxas de churn.</p>
+            <p>Este poder encontra-se em escalada no horizonte imediato: o ciclo de fim de suporte das licenças on-premises, com término previsto para dezembro de 2026, abre uma janela de renegociação activa para os clientes, conferindo-lhes uma alavancagem negocial acrescida num momento em que a empresa necessita de preservar e expandir a sua base instalada.</p>
+            <div class="porter-meter">
+              <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
+              <div class="porter-bar"><div class="porter-bar-fill" style="width:63%;background:var(--gold)"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
+
+  
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PÁGINA: INSTRUMENTOS DE CAPITAL
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-instrumentos">
+  <h1 class="page-title">Instrumentos de Capital — Títulos Preferenciais</h1>
+
+  <div class="section-card">
+    <p>
+      Em 2025, a Strategy emitiu cinco classes de títulos preferenciais perpétuos — 
+      designados colectivamente como <em>digital credit</em> — com estruturas distintas 
+      de dividendo, seniority de liquidação e opcionalidade de conversão. 
+      A tabela seguinte sintetiza as principais características de cada instrumento.
+    </p>
+    <div style="overflow-x:auto; margin:24px 0;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.91em;color:#1a1a1a;">
+        <thead>
+          <tr style="background:#c0392b;color:#fff;">
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid #922b21;">Característica</th>
+            <th style="padding:10px 14px;text-align:center;border-bottom:2px solid #922b21;">STRK (Strike)</th>
+            <th style="padding:10px 14px;text-align:center;border-bottom:2px solid #922b21;">STRF (Strife)</th>
+            <th style="padding:10px 14px;text-align:center;border-bottom:2px solid #922b21;">STRD (Stride)</th>
+            <th style="padding:10px 14px;text-align:center;border-bottom:2px solid #922b21;">STRC (Stretch)</th>
+            <th style="padding:10px 14px;text-align:center;border-bottom:2px solid #922b21;">STRE (Stream)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;background:#f7f9fc;">Bolsa</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Nasdaq</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Nasdaq</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Nasdaq</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Nasdaq</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Luxemburgo</td>
+          </tr>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">1ª Emissão</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Fev. 2025</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Mar. 2025</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Jun. 2025</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Jul. 2025</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Nov. 2025</td>
+          </tr>
+          <tr style="background:#c0392b;color:#fff;">
+            <td style="padding:9px 14px;border-bottom:1px solid #922b21;font-weight:700;">Dividendo</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:600;">8% / trimestral</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:600;">10% / trimestral</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:600;">10% / trimestral</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:600;">Variável (~11%) / mensal</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:600;">10% / trimestral (€)</td>
+          </tr>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;background:#f7f9fc;">Cumulativo</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Sim</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Sim</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Não</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Sim</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Sim</td>
+          </tr>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">Conversível</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Sim (em MSTR)</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Não</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Não</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Não</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;">Não</td>
+          </tr>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;background:#f7f9fc;">Pagamento</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Cash ou ações</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Cash</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Cash</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Cash</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #e0e6ed;background:#f7f9fc;">Cash (€)</td>
+          </tr>
+          <tr style="background:#c0392b;color:#fff;">
+            <td style="padding:9px 14px;border-bottom:1px solid #922b21;font-weight:700;">Seniority liquidação</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:700;">4ª</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:700;">1ª</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:700;">5ª</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:700;">2ª</td>
+            <td style="padding:9px 14px;text-align:center;border-bottom:1px solid #922b21;font-weight:700;">3ª</td>
+          </tr>
+          <tr style="background:#fff;color:#1a1a1a;">
+            <td style="padding:9px 14px;font-weight:600;background:#f7f9fc;">Ações (dez. 2025)</td>
+            <td style="padding:9px 14px;text-align:center;background:#f7f9fc;">13,98M</td>
+            <td style="padding:9px 14px;text-align:center;background:#f7f9fc;">12,84M</td>
+            <td style="padding:9px 14px;text-align:center;background:#f7f9fc;">14,02M</td>
+            <td style="padding:9px 14px;text-align:center;background:#f7f9fc;">29,59M</td>
+            <td style="padding:9px 14px;text-align:center;background:#f7f9fc;">7,75M</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.85em;color:#888;text-align:center;">
+      <em>Tabela — Comparação dos Títulos Preferenciais Perpétuos da Strategy (2025)</em>
+    </p>
+  </div>
+</div>
+<!-- ═══════════════════════════════════════ FIM PÁGINA INSTRUMENTOS ══ -->
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PAGE: MÚLTIPLOS SOTP                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-multiples">
+    <div class="wrap-inner">
+      <div class="page-title">Avaliação pelos Múltiplos — SOTP</div>
+      <div class="page-sub">Strategy Inc — Sum-of-the-Parts (EV/Revenue + mNAV) · Dados: Form 10-K 2025</div>
+
+      <!-- KPIs -->
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+        <div class="kpi-card">
+          <div class="kpi-label">Receitas FY2025</div>
+          <div class="kpi-value">$477.233 M</div>
+          <div class="kpi-sub">Form 10-K 2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">NAV BTC Fair Value</div>
+          <div class="kpi-value">$58.854.028 M</div>
+          <div class="kpi-sub">Balance Sheet 31/12/2025</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Dívida Total Líquida</div>
+          <div class="kpi-value">$8.190.155 M</div>
+          <div class="kpi-sub">Current LTD + LT Debt, net</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">NAV BTC Líquido</div>
+          <div class="kpi-value">$50.663.873 M</div>
+          <div class="kpi-sub">Fair Value − Dívida</div>
+        </div>
+      </div>
+
+      <!-- Nota metodológica -->
+      <div style="background:var(--surface2);border-left:4px solid var(--gold);padding:14px 18px;border-radius:6px;margin-bottom:24px;font-size:0.9rem;line-height:1.6;color:var(--text2)">
+        <strong style="color:var(--gold)">Nota Metodológica</strong><br>
+        O múltiplo <strong>EV/EBITDA</strong> é inaplicável: o EBITDA reportado de −$5.394.385 M está inteiramente distorcido pela perda não realizada de $5.403.476 M sobre Bitcoin (norma ASU 2023-08). Utiliza-se o <strong>EV/Revenue</strong> para o segmento de software e o <strong>mNAV</strong> para a tesouraria Bitcoin, numa metodologia SOTP (<em>Sum-of-the-Parts</em>). A dívida é apurada diretamente do Balanço Consolidado (Current portion of LTD net + LT debt net), líquida de custos de emissão e desconto não amortizado.
+      </div>
+
+      <!-- Tabela SOTP -->
+      <div class="section-title" style="margin-bottom:10px">Resultados SOTP por Cenário</div>
+      <div style="overflow-x:auto;margin-bottom:28px">
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th>Pressuposto</th>
+              <th style="color:#e74c3c">Pessimista</th>
+              <th style="color:var(--gold)">Base</th>
+              <th style="color:#27ae60">Otimista</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Múltiplo EV/Revenue</td><td>3,0x</td><td>4,0x</td><td>5,0x</td></tr>
+            <tr><td>mNAV</td><td>1,00x</td><td>1,23x</td><td>1,57x</td></tr>
+            <tr style="background:var(--surface2)"><td><strong>EV Software (mil $)</strong></td><td>$1.431.699</td><td>$1.908.932</td><td>$2.386.165</td></tr>
+            <tr style="background:var(--surface2)"><td><strong>Valor BTC — mNAV (mil $)</strong></td><td>$50.663.873</td><td>$62.316.564</td><td>$79.542.281</td></tr>
+            <tr style="background:var(--surface2)"><td><strong>Equity Value Total (mil $)</strong></td><td>$52.095.572</td><td>$64.225.496</td><td>$81.928.446</td></tr>
+            <tr style="font-size:1.15rem;font-weight:700">
+              <td>Preço Alvo / Ação ($)</td>
+              <td style="color:#e74c3c">$151,05</td>
+              <td style="color:var(--gold)">$186,22</td>
+              <td style="color:#27ae60">$237,54</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Imaterialidade do software -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+        <div style="background:var(--surface2);border-radius:8px;padding:18px">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:12px">Contribuição do Software</div>
+          <table class="fin-table">
+            <thead><tr><th>Cenário</th><th>$/Ação</th><th>% EV</th></tr></thead>
+            <tbody>
+              <tr><td>Pessimista</td><td>$4,15</td><td>2,75%</td></tr>
+              <tr><td>Base</td><td>$5,53</td><td>2,97%</td></tr>
+              <tr><td>Otimista</td><td>$6,92</td><td>2,91%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="background:var(--surface2);border-radius:8px;padding:18px">
+          <div style="font-weight:700;color:var(--gold);margin-bottom:12px">Sensibilidade ao mNAV</div>
+          <table class="fin-table">
+            <thead><tr><th>mNAV</th><th>Preço/Ação</th><th>Referência</th></tr></thead>
+            <tbody>
+              <tr><td>1,00x</td><td>$152,43</td><td>Par com NAV (MARA)</td></tr>
+              <tr><td>1,23x</td><td style="color:var(--gold)">$186,22</td><td>mNAV dez 2025</td></tr>
+              <tr><td>1,57x</td><td>$236,16</td><td>Média hist. 2023-24</td></tr>
+              <tr><td>2,00x</td><td>$299,33</td><td>Regressão ao pico</td></tr>
+              <tr><td>2,36x</td><td>$352,21</td><td>Pico histórico 2024</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Insight mNAV -->
+      <div style="background:rgba(255,193,7,0.08);border:1px solid var(--gold);border-radius:8px;padding:16px 20px;font-size:0.92rem;line-height:1.7;color:var(--text2)">
+        <strong style="color:var(--gold)">Conclusão Central:</strong> O segmento de software contribui apenas <strong>2,97%</strong> do equity value no cenário base — os restantes <strong>97%</strong> provêm do Bitcoin. Uma variação de 0,10x no mNAV corresponde a <strong>≈ $14,69 por ação</strong>, magnitude que supera em mais de 3× o contributo total do segmento de software. A Strategy é avaliada pelo mercado exclusivamente como um veículo de exposição alavancada a Bitcoin.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- PAGE: RECOMENDAÇÃO DE INVESTIMENTO                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-rec">
+    <div class="wrap-inner">
+      <div class="page-title">Recomendação de Investimento</div>
+      <div class="page-sub">Strategy Inc — Triangulação DCF + SOTP · Cotação referência: $151,95 (31/12/2025)</div>
+
+      <!-- KPIs recomendação -->
+      <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+        <div class="kpi-card">
+          <div class="kpi-label">Cotação 31/12/2025</div>
+          <div class="kpi-value">$151,95</div>
+          <div class="kpi-sub">Preço de referência</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Ponderado Base</div>
+          <div class="kpi-value" style="color:var(--gold)">$198,74</div>
+          <div class="kpi-sub">Upside: +30,79%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Preço Ponderado Otimista</div>
+          <div class="kpi-value" style="color:#27ae60">$254,11</div>
+          <div class="kpi-sub">Upside: +67,24%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Recomendação MSTR</div>
+          <div class="kpi-value" style="color:#27ae60;font-size:1.4rem">✅ BUY</div>
+          <div class="kpi-sub">Cotação abaixo do cenário base</div>
+        </div>
+      </div>
+
+      <!-- Tabela triangulação -->
+      <div class="section-title" style="margin-bottom:10px">Triangulação de Modelos</div>
+      <div style="overflow-x:auto;margin-bottom:28px">
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th style="text-align:right">Ponderação</th>
+              <th style="color:#e74c3c;text-align:right">Pessimista</th>
+              <th style="color:var(--gold);text-align:right">Base</th>
+              <th style="color:#27ae60;text-align:right">Otimista</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>DCF — Cenário A (DCF Puro)</td><td style="text-align:right">25,00%</td><td style="text-align:right">$110,63</td><td style="text-align:right">$130,43</td><td style="text-align:right">$150,90</td></tr>
+            <tr><td>DCF — Cenário B (mNAV)</td><td style="text-align:right">37,50%</td><td style="text-align:right">$148,35</td><td style="text-align:right">$256,79</td><td style="text-align:right">$339,49</td></tr>
+            <tr><td>Múltiplos SOTP</td><td style="text-align:right">37,50%</td><td style="text-align:right">$151,05</td><td style="text-align:right">$186,22</td><td style="text-align:right">$237,54</td></tr>
+            <tr style="font-weight:700;background:var(--surface2)">
+              <td>Preço Ponderado</td><td style="text-align:right">100,00%</td>
+              <td style="text-align:right;color:#e74c3c">$139,93</td>
+              <td style="text-align:right;color:var(--gold)">$198,74</td>
+              <td style="text-align:right;color:#27ae60">$254,11</td>
+            </tr>
+            <tr style="background:rgba(255,255,255,0.04)">
+              <td><strong>Preço da Ação (31/12/2025)</strong></td><td style="text-align:right">—</td>
+              <td style="text-align:right">$151,95</td><td style="text-align:right">$151,95</td><td style="text-align:right">$151,95</td>
+            </tr>
+            <tr>
+              <td>Upside / Downside ($)</td><td style="text-align:right">—</td>
+              <td style="text-align:right;color:#e74c3c">−$12,02</td>
+              <td style="text-align:right;color:var(--gold)">+$46,79</td>
+              <td style="text-align:right;color:#27ae60">+$102,16</td>
+            </tr>
+            <tr style="font-weight:700;font-size:1.05rem">
+              <td>% Upside / Downside</td><td style="text-align:right">—</td>
+              <td style="text-align:right;color:#e74c3c">−7,91%</td>
+              <td style="text-align:right;color:var(--gold)">+30,79%</td>
+              <td style="text-align:right;color:#27ae60">+67,24%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Recomendação por instrumento -->
+      <div class="section-title" style="margin-bottom:10px">Recomendação por Instrumento</div>
+      <div style="overflow-x:auto;margin-bottom:28px">
+        <table class="fin-table">
+          <thead>
+            <tr><th>Instrumento</th><th>Recomendação</th><th>Racional</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>MSTR</strong></td>
+              <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ BUY</td>
+              <td>Cotação $151,95 abaixo do cenário base ponderado ($198,74); upside de ~55% pela normalização do mNAV para a média histórica (1,57x) sem apreciação adicional do BTC</td>
+            </tr>
+            <tr>
+              <td><strong>STRF</strong></td>
+              <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ Comprar</td>
+              <td>10% ao ano, maior senioridade na hierarquia de liquidação; comportamento análogo a obrigação de alto rendimento perpétua</td>
+            </tr>
+            <tr>
+              <td><strong>STRC</strong></td>
+              <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ Comprar</td>
+              <td>Taxa variável com estabilidade a $100; perfil de mercado monetário de alto rendimento; maior liquidez entre as preferenciais</td>
+            </tr>
+            <tr>
+              <td><strong>STRD</strong></td>
+              <td style="color:#aaa;font-weight:700;white-space:nowrap">⚪ Neutro</td>
+              <td>Dividendo não cumulativo — valor perde-se definitivamente em caso de omissão trimestral</td>
+            </tr>
+            <tr>
+              <td><strong>STRK</strong></td>
+              <td style="color:#f39c12;font-weight:700;white-space:nowrap">⚠️ Especulativo</td>
+              <td>Opcionalidade de conversão a $1.000/ação exige forte apreciação da MSTR para ser exercida</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Riscos -->
+      <div class="section-title" style="margin-bottom:10px">Principais Riscos da Tese</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+        <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
+          <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Concentração Extrema</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">95,5% do ativo total em Bitcoin. Equity Ratio ajustado sem BTC: −528,54%. Toda a solvência depende do preço do Bitcoin.</div>
+        </div>
+        <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
+          <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Risco de Refinanciamento</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">Interest Coverage Ratio ajustado: −0,63x. Dívida líquida: $8.190.155 M. Dependência estrutural dos mercados de capitais.</div>
+        </div>
+        <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
+          <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Compressão do mNAV</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">mNAV caiu de 2,36x (2024) para 1,23x (2025). Proliferação de ETFs spot e empresas imitadoras pode comprimir o prémio abaixo de 1,00x.</div>
+        </div>
+        <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
+          <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Diluição Estrutural</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">Emissões ATM contínuas (+8%/ano estimado). Sem acumulação de BTC, a diluição anularia os ganhos por ação mesmo com apreciação do Bitcoin.</div>
+        </div>
+      </div>
+
+      <!-- Box tese central -->
+      <div style="background:rgba(39,174,96,0.08);border:1px solid #27ae60;border-radius:8px;padding:16px 20px;font-size:0.93rem;line-height:1.7;color:var(--text2)">
+        <strong style="color:#27ae60">Tese de Investimento Central:</strong> A cotação de $151,95 em 31/12/2025 atribuía à Strategy um mNAV próximo de 1,00x — muito abaixo da média histórica de 1,57x (2023–2024). A recuperação do mNAV para a média histórica, <em>sem qualquer apreciação adicional do Bitcoin</em>, implicaria um preço-alvo próximo de <strong>$236</strong>, representando um upside de aproximadamente <strong>55%</strong>. A tese assenta em dois vetores independentes: normalização do mNAV + apreciação de longo prazo do Bitcoin.
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PÁGINA: CORRELAÇÃO MSTR / BTC / NASDAQ
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-correlacao">
+  <h1 class="page-title">Correlação entre a Strategy, BTC/USD e NASDAQ</h1>
+
+  <!-- ── Secção 1: Performance Normalizada ── -->
+  <div class="section-card">
+    <p>
+      A relação entre a cotação da Strategy (MSTR) e o preço da Bitcoin é um dos elementos 
+      centrais para compreender o modelo de negócio da empresa. Desde agosto de 2020, data 
+      em que a Strategy iniciou a sua estratégia de acumulação de Bitcoin em tesouraria, a ação 
+      da empresa registou uma valorização substancialmente superior à da própria Bitcoin e ao 
+      índice tecnológico NASDAQ, evidenciando o efeito de alavancagem estruturalmente 
+      incorporado no seu modelo de negócio. A partir de 2024, com a aceleração das aquisições 
+      financiadas por emissão de dívida e capital, o MSTR chegou a atingir uma valorização 
+      aproximada de <strong>27x</strong> face ao valor de agosto de 2020, contra aproximadamente 
+      <strong>7x</strong> do BTC e <strong>2x</strong> do NASDAQ no mesmo período.
+    </p>
+    <div style="text-align:center; margin:24px 0;">
+      <img src="StrategyBTCNASDAQ.png"
+           alt="Strategy vs Bitcoin vs NASDAQ — Normalizado (Base 100, 2020–2026)"
+           style="max-width:100%;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.18);" />
+      <p style="font-size:0.83em;color:#888;margin-top:8px;">
+        <em>Figura 1: Strategy vs Bitcoin vs NASDAQ (Normalizado) (Base 100, 2020–2026)</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Secção 2: Heatmap Correlação Estática ── -->
+  <div class="section-card">
+    <h2 class="section-title">Correlação Estática — Matriz de Pearson</h2>
+    <p>
+      A ligação estrutural entre a Strategy e a Bitcoin é corroborada pela análise de correlação 
+      estática. A matriz de correlação de Pearson, calculada com base em retornos mensais para 
+      o período 2020–2026, revela uma correlação de <strong>0,74</strong> entre a MSTR e o BTC-USD. 
+      Este valor é significativamente superior à correlação da MSTR com o NASDAQ (<strong>0,57</strong>) 
+      e à do BTC-USD com o NASDAQ (<strong>0,53</strong>), confirmando que o comportamento da ação da 
+      Strategy é determinado predominantemente pelo preço do Bitcoin, e não pela dinâmica geral 
+      do mercado tecnológico.
+    </p>
+    <div style="text-align:center; margin:24px 0;">
+            <img src="heatmap.png"
+           alt="Mapa de Correlação — MSTR, BTC, NASDAQ (2020–2026)"
+           style="max-width:72%;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.18);" />
+      <p style="font-size:0.83em;color:#888;margin-top:8px;">
+        <em>Figura 2: Mapa de Correlação MSTR, BTC e NASDAQ (2020–2026)</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Secção 3: Scatter Plot ── -->
+  <div class="section-card">
+    <h2 class="section-title">Scatter Plot — Retornos Mensais MSTR vs BTC</h2>
+    <p>
+      A análise de dispersão dos retornos mensais confirma visualmente a relação linear positiva 
+      entre a MSTR e o BTC-USD, com um coeficiente Beta (β) estimado de <strong>0,43</strong>. 
+      A distribuição dos pontos em torno da linha de tendência evidencia a natureza de 
+      <em>proxy</em> alavancado da Strategy relativamente ao Bitcoin: a empresa amplifica os 
+      movimentos do ativo subjacente, tanto nos ciclos de valorização como nos de contração.
+    </p>
+    <div style="text-align:center; margin:24px 0;">
+      <img src="ScatterPlot.png"
+           alt="Scatter Plot: Retornos Mensais MSTR vs BTC-USD (2020–2026)"
+           style="max-width:100%;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.18);" />
+      <p style="font-size:0.83em;color:#888;margin-top:8px;">
+        <em>Figura 3: Scatter Plot: Retornos Mensais MSTR vs BTC-USD (2020–2026)</em>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Secção 4: Correlação Rolling ── -->
+  <div class="section-card">
+    <h2 class="section-title">Correlação Rolling 12 Meses</h2>
+    <p>
+      A correlação entre a MSTR e a BTC não é estática ao longo do tempo. A correlação rolante 
+      de 12 meses permite identificar como esta relação evoluiu em resposta a eventos de mercado 
+      relevantes. Durante o período de 2021 a 2022, a correlação cresceu progressivamente de 0,5 
+      para valores próximos de 0,9, à medida que o mercado passou a reconhecer e a precificar a 
+      Strategy como um veículo de exposição alavancada ao Bitcoin. O colapso da <em>exchange</em> 
+      FTX em novembro de 2022 não quebrou a correlação; pelo contrário, ambos os ativos caíram 
+      em simultâneo, mantendo-a elevada e confirmando a natureza sistémica do choque.
+    </p>
+    <p>
+      O momento de maior divergência ocorreu em janeiro de 2024, com a aprovação dos primeiros 
+      ETFs Spot de Bitcoin pela SEC americana. A correlação desceu temporariamente para cerca 
+      de <strong>0,65</strong>, reflexo de uma divergência de curto prazo em que o Bitcoin foi 
+      impulsionado pela procura institucional direta através dos novos instrumentos, enquanto a 
+      MSTR beneficiou de forma mais gradual. Após este período de ajustamento, a correlação 
+      voltou a estabilizar acima do <em>threshold</em> de <strong>0,7</strong>, confirmando a 
+      dependência estrutural e de longo prazo entre os dois ativos.
+    </p>
+    <div style="text-align:center; margin:24px 0;">
+            <img src="Rolling.png"
+           alt="Correlação Rolling 12M — MSTR × BTC-USD (2020–2026)"
+           style="max-width:100%;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.18);" />
+      <p style="font-size:0.83em;color:#888;margin-top:8px;">
+        <em>Figura 4: Correlação Rolling 12M (MSTR × BTC-USD) (2020–2026)</em>
+      </p>
+    </div>
+    <p>
+      A persistência de uma correlação elevada, mesmo após a introdução dos ETFs Spot, reforça 
+      a tese de que a Strategy não é simplesmente um substituto do Bitcoin, mas um instrumento 
+      distinto — um <em>proxy</em> alavancado que amplifica tanto os ganhos como as perdas do ativo 
+      subjacente. Em março de 2026, a empresa detinha <strong>762.099 BTC</strong> no seu balanço, 
+      equivalentes a aproximadamente <strong>3,6%</strong> da oferta total de Bitcoin, o que confere à 
+      cotação da MSTR uma sensibilidade estrutural, e não meramente correlacional, às variações 
+      do preço do Bitcoin. Esta distinção é fundamental para a análise de risco e de valorização 
+      da empresa no contexto do presente trabalho de investigação.
+    </p>
+  </div>
+
+</div>
+<!-- ═══════════════════════════════════════ FIM PÁGINA CORRELAÇÃO ══ -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PÁGINA: PRESSUPOSTOS DOS MODELOS
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-pressupostos">
+  <h1 class="page-title">Pressupostos dos Modelos de Precificação</h1>
+
+  <!-- ── Modelo Strategy ── -->
+  <div class="section-card">
+    <h2 class="section-title">Strategy: Valuation by BTC and Liquidity Stress Test</h2>
+    <p>
+      O modelo de avaliação da Strategy assenta numa metodologia de <em>Stress Test</em> de liquidez 
+      com três cenários — <strong>Valor base</strong>, <strong>Stress severo</strong> e <strong>Crise</strong> —, 
+      permitindo avaliar a resiliência do balanço da empresa face a diferentes níveis de 
+      drawdown do Bitcoin e compressão do mNAV. Os pressupostos centrais utilizados são os seguintes:
+    </p>
+    <div style="overflow-x:auto; margin:24px 0;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.92em;color:#1a1a1a;background:#fff;">
+        <thead>
+          <tr style="background:#1e3a5f;color:#fff;">
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid #2d6a9f;">Parâmetro</th>
+            <th style="padding:10px 14px;text-align:right;border-bottom:2px solid #2d6a9f;">Valor base</th>
+            <th style="padding:10px 14px;text-align:right;border-bottom:2px solid #2d6a9f;">Stress severo</th>
+            <th style="padding:10px 14px;text-align:right;border-bottom:2px solid #2d6a9f;">Crise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">BTC holdings (BTC)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">717,131</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">717,131</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">717,131</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Diluted shares (shares)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">344,897,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">344,897,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">344,897,000</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Future BTC price USD/BTC (1 year)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">86,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">86,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">86,000</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">BTC drawdown (%)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#2d6a9f;">5,00%</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#e67e22;">35,00%</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#c0392b;">60,00%</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">mNAV multiple</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#2d6a9f;">1,10×</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#e67e22;">0,85×</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#c0392b;">0,60×</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">Cash / USD reserve (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#2d6a9f;">2,250,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#e67e22;">1,500,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;color:#c0392b;">500,000</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">Debt (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;">8,250,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;">8,250,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;">8,250,000</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Preferred claims / buffer (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">8,470,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">8,470,000</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">8,470,000</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Annual preferred dividends (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">381,367</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">381,367</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">381,367</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Annual debt interest (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">36,2</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">36,2</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">36,2</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;font-weight:600;">Annual obligations (thousands USD)</td>
+            <td style="padding:9px 14px;text-align:right;font-weight:600;">417,567</td>
+            <td style="padding:9px 14px;text-align:right;font-weight:600;">417,567</td>
+            <td style="padding:9px 14px;text-align:right;font-weight:600;">417,567</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.85em;color:#888;text-align:center;">
+      <em>Tabela 1 — Pressupostos do Modelo Strategy: Valuation by BTC and Liquidity Stress Test</em>
+    </p>
+    <div style="text-align:center;margin-top:8px;">
+      <a href="https://strategy-model.streamlit.app/" target="_blank"
+         style="display:inline-block;padding:10px 24px;background:#1e3a5f;color:#fff;border-radius:6px;text-decoration:none;font-size:0.92em;font-weight:600;letter-spacing:0.3px;">
+        🚀 Abrir Modelo Interactivo →
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Modelo BTC ── -->
+  <div class="section-card">
+    <h2 class="section-title">Modelo Macro Bitcoin</h2>
+    <p>
+      O modelo macro de precificação do Bitcoin integra quatro vetores analíticos independentes — 
+      <strong>Stock-to-Flow (S2F)</strong>, <strong>crescimento da oferta monetária M2</strong>, 
+      <strong>Lei de Metcalfe</strong> e <strong>curva de adoção</strong> — cujos outputs são 
+      ponderados de forma configurável para produzir um preço-alvo composto. 
+      Os pressupostos base utilizados no modelo são os seguintes:
+    </p>
+    <div style="overflow-x:auto; margin:24px 0;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.92em;color:#1a1a1a;background:#fff;">
+        <thead>
+          <tr style="background:#1e3a5f;color:#fff;">
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid #2d6a9f;">Parâmetro</th>
+            <th style="padding:10px 14px;text-align:right;border-bottom:2px solid #2d6a9f;">Valor utilizado</th>
+            <th style="padding:10px 14px;text-align:left;border-bottom:2px solid #2d6a9f;">Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Horizonte (anos)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">Configurável</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Período de projeção do modelo</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Crescimento M2 anual (%)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">Configurável</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Taxa de expansão da oferta monetária global M2</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Elasticidade BTC ao M2</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">0,80</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Sensibilidade do preço BTC a variações do M2</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Adoção actual (%)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">5</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Percentagem actual de adopção global estimada</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Teto adopção (%)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">25</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Adopção máxima estimada no horizonte de análise</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Velocidade adopção</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">0,33</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Parâmetro logístico da curva de adopção (S-curve)</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Expoente Metcalfe</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">1,70</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Expoente da Lei de Metcalfe aplicada à rede Bitcoin</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">Peso S2F</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;">0,35</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Ponderação do modelo Stock-to-Flow no composto final</td>
+          </tr>
+          <tr style="background:#f7f9fc;color:#1a1a1a;">
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;font-weight:600;">Peso M2</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;font-weight:600;">0,35</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Ponderação do componente M2 no composto final</td>
+          </tr>
+          <tr style="color:#1a1a1a;">
+            <td style="padding:9px 14px;font-weight:600;">Peso Adopção (automático)</td>
+            <td style="padding:9px 14px;text-align:right;font-weight:600;">0,30</td>
+            <td style="padding:9px 14px;">Ponderação residual atribuída ao componente de adopção</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.85em;color:#888;text-align:center;">
+      <em>Tabela 2 — Pressupostos do Modelo Macro Bitcoin (parâmetros base configuráveis no modelo interactivo)</em>
+    </p>
+    <div style="text-align:center;margin-top:8px;">
+      <a href="https://btc-model-marcos.streamlit.app/" target="_blank"
+         style="display:inline-block;padding:10px 24px;background:#f7931a;color:#fff;border-radius:6px;text-decoration:none;font-size:0.92em;font-weight:600;letter-spacing:0.3px;">
+        🚀 Abrir Modelo Interactivo →
+      </a>
+    </div>
+  </div>
+
+</div>
+<!-- ═══════════════════════════════════════ FIM PÁGINA PRESSUPOSTOS ══ -->
+
+<script>
+/* ── NAV ── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='dcf') setTimeout(render,50);
+}
+
+/* ── DCF MODEL ── */
+const g=id=>document.getElementById(id);
+const val=id=>parseFloat((g(id).value||'0').replace(',','.'))||0;
+const pct=id=>val(id)/100;
+const fmtN=(n,d=2)=>n.toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtI=n=>Math.round(n).toLocaleString('pt-PT');
+const fmtP=n=>fmtN(n*100,2)+'%';
+const fmtB=n=>{const a=Math.abs(n);if(a>=1e9)return(n/1e9).toFixed(1)+'B';if(a>=1e6)return(n/1e6).toFixed(0)+'M';return fmtI(n)};
+
+let activeTab='A';
+function setTab(t){
+  activeTab=t;
+  g('tab_a').className='toggle-tab'+(t==='A'?' active-a':'');
+  g('tab_b').className='toggle-tab'+(t==='B'?' active-b':'');
+  render();
+}
+
+let fcffChart=null;
+
+function calc(){
+  const rf=pct('i_rf'),beta=val('i_beta'),erp=pct('i_erp'),
+        kd=pct('i_kd'),tax=pct('i_tax'),
+        D=val('i_debt'),E=val('i_equity'),
+        btc=val('i_btc'),px=val('i_btcpx'),
+        disc=pct('i_disc'),mnav=val('i_mnav'),
+        cash=val('i_cash'),debtBr=val('i_debtbr'),
+        pref=val('i_pref'),sh=val('i_shares'),
+        rev0=val('i_rev0'),g_tv=pct('i_g');
+  const ke=rf+beta*erp,Vtot=D+E;
+  const wacc=(E/Vtot)*ke+(D/Vtot)*kd*(1-tax);
+  const gRev=[pct('i_gr1'),pct('i_gr2'),pct('i_gr3'),pct('i_gr4'),pct('i_gr5')];
+  const ebitdaM=[pct('i_em1'),pct('i_em2'),pct('i_em3'),pct('i_em4'),pct('i_em5')];
+  const da=[val('i_da1'),val('i_da2'),val('i_da3'),val('i_da4'),val('i_da5')];
+  const cx=[val('i_cx1'),val('i_cx2'),val('i_cx3'),val('i_cx4'),val('i_cx5')];
+  const wc=[val('i_wc1'),val('i_wc2'),val('i_wc3'),val('i_wc4'),val('i_wc5')];
+  const rev=[],ebitda=[],ebit=[],nopat=[],fcff=[],pvArr=[];
+  let prevRev=rev0;
+  for(let i=0;i<5;i++){
+    const r=prevRev*(1+gRev[i]);prevRev=r;rev.push(r);
+    const eb=r*ebitdaM[i];ebitda.push(eb);
+    const et=eb-da[i];ebit.push(et);
+    const np=et*(1-tax);nopat.push(np);
+    const fc=np+da[i]-wc[i]-cx[i];fcff.push(fc);
+    pvArr.push(fc/Math.pow(1+wacc,i+1));
+  }
+  const sumPv=pvArr.reduce((a,b)=>a+b,0);
+  const tv=fcff.at(-1)*(1+g_tv)/(wacc-g_tv);
+  const pvTv=tv/Math.pow(1+wacc,5);
+  const evSw=sumPv+pvTv;
+  const netDebt=debtBr-cash;
+  const btcNavA=btc*px*(1-disc)/1000;
+  const evA=evSw+btcNavA,eqA=evA-netDebt-pref,prA=eqA/sh;
+  const btcNavB=btc*px*mnav/1000;
+  const evB=evSw+btcNavB,eqB=evB-netDebt-pref,prB=eqB/sh;
+  const mktPx=val('i_mktprice');
+  const mktCap=mktPx*sh;
+  const evMkt=mktCap+debtBr-cash;
+  const btcNavRaw=btc*px/1000;
+  const mnavImpl=btcNavRaw>0?evMkt/btcNavRaw:0;
+  return{ke,Vtot,wacc,rev,ebitda,da,ebit,nopat,fcff,pvArr,sumPv,tv,pvTv,evSw,
+         netDebt,btcNavA,evA,eqA,prA,btcNavB,evB,eqB,prB,mnav,mnavImpl,
+         mktPx,cash,debtBr,pref,sh,btcNavRaw};
+}
+
+function getRegime(m){
+  if(m<0.5)return{label:'Desconto Profundo',color:'#ff4d6d'};
+  if(m<0.85)return{label:'Desconto ao NAV',color:'#ff8a3d'};
+  if(m<1.15)return{label:'≈ PAR com NAV',color:'#f0b90b'};
+  if(m<2.0)return{label:'Prémio Moderado',color:'#19c37d'};
+  if(m<3.0)return{label:'Prémio Elevado',color:'#2dc6ff'};
+  return{label:'Prémio Extremo',color:'#c084fc'};
+}
+
+function render(){
+  const c=calc();
+  g('o_ke').textContent=fmtP(c.ke);
+  g('o_v').textContent=fmtI(c.Vtot);
+  g('o_wacc').textContent=fmtP(c.wacc);
+  g('o_sumPv').textContent=fmtI(c.sumPv);
+  g('o_tv').textContent=fmtI(c.tv);
+  g('o_pvtv').textContent=fmtI(c.pvTv);
+  g('o_evsw').textContent=fmtI(c.evSw);
+  const reg=getRegime(c.mnavImpl);
+  g('o_mnavImpl').innerHTML=`<span style="color:${reg.color}">${fmtN(c.mnavImpl,2)}×</span>`;
+  g('o_regime').innerHTML=`<span style="color:${reg.color}">${reg.label}</span>`;
+  const btcNavImpl=c.btcNavRaw*c.mnavImpl;
+  const evImpl=c.evSw+btcNavImpl;
+  const eqImpl=evImpl-c.netDebt-c.pref;
+  const prImpl=eqImpl/c.sh;
+  g('o_targetImpl').textContent='$'+fmtN(prImpl);
+  const rows=[
+    ['Receita',c.rev],['EBITDA',c.ebitda],['D&A',c.da],['EBIT',c.ebit],
+    ['NOPAT',c.nopat],
+    ['CapEx',[val('i_cx1'),val('i_cx2'),val('i_cx3'),val('i_cx4'),val('i_cx5')]],
+    ['ΔWC',[val('i_wc1'),val('i_wc2'),val('i_wc3'),val('i_wc4'),val('i_wc5')]],
+    ['FCFF',c.fcff],['PV(FCFF)',c.pvArr]
+  ];
+  g('forecastBody').innerHTML=rows.map(([lbl,arr])=>`<tr><td>${lbl}</td>${arr.map(x=>`<td>${fmtN(x)}</td>`).join('')}</tr>`).join('');
+  const isB=activeTab==='B';
+  const btcNav=isB?c.btcNavB:c.btcNavA;
+  const ev=isB?c.evB:c.evA;
+  const eq=isB?c.eqB:c.eqA;
+  const pr=isB?c.prB:c.prA;
+  const btcLabel=isB?`BTC NAV × ${fmtN(c.mnav,2)}× mNAV`:'BTC NAV × (1 − '+fmtN(val('i_disc'),0)+'% desconto)';
+  g('bridgeTitle').textContent=`BRIDGE SOTP — MÉTODO ${activeTab}`;
+  g('bridgeBlock').innerHTML=`
+    <div class="bridge-row"><span class="bridge-label">(+) EV Negócio Software</span><span class="bridge-val pos">$${fmtB(c.evSw*1000)}</span></div>
+    <div class="bridge-row"><span class="bridge-label">(+) ${btcLabel}</span><span class="bridge-val pos">$${fmtB(btcNav*1000)}</span></div>
+    <div class="bridge-row total-ev"><span class="bridge-label"><strong>= Enterprise Value Total</strong></span><span class="bridge-val total">$${fmtB(ev*1000)}</span></div>
+    <div class="bridge-row"><span class="bridge-label">(−) Dívida Bruta</span><span class="bridge-val neg">−$${fmtB(c.debtBr*1000)}</span></div>
+    <div class="bridge-row"><span class="bridge-label">(+) Caixa &amp; Equiv.</span><span class="bridge-val pos">+$${fmtB(c.cash*1000)}</span></div>
+    <div class="bridge-row"><span class="bridge-label">(−) Dívida Líquida</span><span class="bridge-val neg">−$${fmtB(c.netDebt*1000)}</span></div>
+    <div class="bridge-row"><span class="bridge-label">(−) Preferred Stock</span><span class="bridge-val neg">−$${fmtB(c.pref*1000)}</span></div>
+    <div class="bridge-row total-eq"><span class="bridge-label"><strong>= Equity Value</strong></span><span class="bridge-val eq">$${fmtB(eq*1000)}</span></div>
+    <div class="bridge-row price-row"><span class="bridge-label" style="font-weight:700;color:var(--text)"> Preço / Ação</span><span class="bridge-val price">$${fmtN(pr)}</span></div>`;
+  const years=['2026','2027','2028','2029','2030'];
+  const fcffM=c.fcff.map(x=>x/1000);
+  const pvM=c.pvArr.map(x=>x/1000);
+  if(fcffChart)fcffChart.destroy();
+  fcffChart=new Chart(g('fcffChart'),{
+    type:'bar',
+    data:{
+      labels:years,
+      datasets:[
+        {label:'FCFF ($M)',data:fcffM,backgroundColor:'rgba(255,100,20,.8)',borderColor:'rgba(255,100,20,1)',borderWidth:1.5,borderRadius:5,borderSkipped:false},
+        {label:'PV(FCFF) ($M)',data:pvM,backgroundColor:'rgba(255,160,80,.3)',borderColor:'rgba(255,160,80,.65)',borderWidth:1.5,borderRadius:5,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,aspectRatio:1.6,
+      plugins:{
+        legend:{position:'bottom',labels:{color:'#a0a8b0',font:{size:12,family:'Inter'},boxWidth:12,padding:14,usePointStyle:true,pointStyle:'rect'}},
+        tooltip:{callbacks:{label:ctx=>`$${ctx.parsed.y.toFixed(1)}M`}}
+      },
+      scales:{
+        x:{ticks:{color:'#a0a8b0',font:{size:12,family:'Inter'}},grid:{color:'rgba(255,255,255,.04)'}},
+        y:{beginAtZero:true,ticks:{color:'#a0a8b0',font:{size:11,family:'Inter'},callback:v=>`$${v.toFixed(0)}M`},grid:{color:'rgba(255,255,255,.06)'},title:{display:true,text:'USD $M',color:'#5c656e',font:{size:11}}}
+      }
+    }
+  });
+}
+
+document.querySelectorAll('input.cell').forEach(el=>el.addEventListener('input',render));
+render();
+
+/* ── NAV TOGGLE ── */
+let navOpen = false;
+function toggleNav(){
+  const nav = document.getElementById('page-dcf') ? document.querySelector('.sidenav') : null;
+  const sidenav = document.querySelector('.sidenav');
+  const main = document.querySelector('.main-content');
+  const overlay = document.getElementById('navOverlay');
+  const icon = document.getElementById('toggleIcon');
+  navOpen = !navOpen;
+  if(navOpen){
+    sidenav.classList.remove('collapsed');
+    main.classList.remove('expanded');
+    overlay.classList.remove('visible');
+    icon.textContent = '';
+  } else {
+    sidenav.classList.add('collapsed');
+    main.classList.add('expanded');
+    if(window.innerWidth <= 700) overlay.classList.add('visible');
+    icon.textContent = '☰';
+  }
+}
+
+// Start with sidebar hidden
+(function(){
+  const sidenav = document.querySelector('.sidenav');
+  const main = document.querySelector('.main-content');
+  sidenav.classList.add('collapsed');
+  main.classList.add('expanded');
+})();
+</script>
+</body>
+</html>
