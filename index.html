@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Strategy — Financial Model</title>
+<title>Strategy Financial Model</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -301,19 +301,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     </div>
     <div class="nav-divider"></div>
     <div class="nav-section">Modelos de Precificação</div>
-    <!-- ============================================================
-         PASSO 1: Substitui URL_MODELO_I pelo link do Modelo de Precificação I
-         Exemplo: href="https://docs.google.com/spreadsheets/d/SEU_ID"
-         ============================================================ -->
+
     <a href="https://btc-model-marcos.streamlit.app/" target="_blank" style="text-decoration:none;color:inherit;">
       <div class="nav-item" id="nav-modelo1">
         <span class="nav-icon">📄</span>Modelo Macro Bitcoin
       </div>
     </a>
-    <!-- ============================================================
-         PASSO 2: Substitui URL_MODELO_II pelo link do Modelo de Precificação II
-         Exemplo: href="https://docs.google.com/spreadsheets/d/SEU_ID"
-         ============================================================ -->
     <a href="https://strategy-model.streamlit.app/" target="_blank" style="text-decoration:none;color:inherit;">
       <div class="nav-item" id="nav-modelo2">
         <span class="nav-icon">📄</span>Strategy: Valuation by BTC and Liquidity Stress Test
@@ -333,7 +326,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
       <div style="margin-bottom:22px">
         <h1 style="font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">🌐 Contexto Macroeconómico Atual</h1>
-        <p style="color:var(--muted);font-size:.88rem">Enquadramento das condições macro que condicionam a avaliação da Strategy — Junho 2026</p>
+        <p style="color:var(--muted);font-size:.88rem">Enquadramento das condições macro que condicionam a avaliação da Strategy: Junho 2026</p>
       </div>
 
       <!-- POLÍTICA MONETÁRIA -->
@@ -344,13 +337,13 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         </div>
         <div class="panel-body">
           <p style="font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.88);margin-bottom:12px">
-            A Reserva Federal norte-americana manteve a taxa de juro dos <em>fed funds</em> num intervalo de <strong style="color:var(--accent)">4,25%–4,50%</strong> durante o início de 2026, após uma série de cortes efectuados no final de 2025. Esta postura de pausa reflecte a persistência de pressões inflacionistas: a inflação CPI registou <strong>2,7%</strong> em termos homólogos, acima do objectivo de 2% da Fed, o que condiciona o apetite por activos de risco, incluindo o Bitcoin.
+            A Reserva Federal norte-americana manteve a taxa de juro dos <em>fed funds</em> num intervalo de <strong style="color:var(--accent)">3,50–3,75%</strong> durante o início de 2026, após uma série de cortes efectuados no final de 2025. Esta postura de pausa reflecte a persistência de pressões inflacionistas: a inflação CPI registou <strong>2,7%</strong> em termos homólogos, acima do objectivo de 2% da Fed, o que condiciona o apetite por activos de risco, incluindo o Bitcoin.
           </p>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:8px">
             <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
               <div style="color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Fed Funds Rate</div>
-              <div style="font-size:1.5rem;font-weight:800;color:var(--accent)">4,25–4,50%</div>
-              <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Pausa — início 2026</div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--accent)">3,50–3,75%</div>
+              <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Início 2026</div>
             </div>
             <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
               <div style="color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Inflação CPI (YoY)</div>
@@ -364,13 +357,13 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
             </div>
             <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
               <div style="color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Yield US Treasury 10A</div>
-              <div style="font-size:1.5rem;font-weight:800;color:var(--red)">~5%</div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--red)">4,45-4,56%</div>
               <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Pressão no custo de capital</div>
             </div>
           </div>
           <div style="background:rgba(255,100,20,.08);border:1px solid rgba(255,100,20,.2);border-radius:8px;padding:12px 14px;margin-top:14px">
             <span style="color:var(--accent);font-weight:700;font-size:.82rem">⚠ Impacto Strategy:</span>
-            <span style="color:rgba(255,255,255,.8);font-size:.85rem;margin-left:6px">Os mercados de futuros antecipam apenas um corte de taxa em 2026, o que mantém o custo de capital estruturalmente elevado. A <em>yield</em> a 10 anos aproximou-se dos 5%, encarecendo o serviço da dívida de empresas altamente alavancadas como a Strategy.</span>
+            <span style="color:rgba(255,255,255,.8);font-size:.85rem;margin-left:6px">Os mercados de futuros antecipam apenas um corte de taxa em 2026, o que mantém o custo de capital estruturalmente elevado. A <em>yield</em> a 10 anos aproximou-se dos 4,45%-4,56%, encarecendo o serviço da dívida de empresas altamente alavancadas como a Strategy.</span>
           </div>
         </div>
       </div>
@@ -383,17 +376,17 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         </div>
         <div class="panel-body">
           <p style="font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.88);margin-bottom:12px">
-            A economia norte-americana cresceu a um ritmo anualizado de <strong style="color:var(--green)">+2,1%</strong> no início de 2026, num registo de expansão moderada sem sinais de recessão imediata. O défice fiscal elevado dos EUA e as políticas tarifárias introduzidas pela administração <strong>Trump</strong> exercem pressão adicional sobre a inflação de longo prazo, com as expectativas de inflação de longo prazo a ascenderem a <strong style="color:var(--gold)">4,0%</strong>, segundo as projecções de Dezembro de 2025.
+            A economia norte-americana cresceu a um ritmo anualizado de <strong style="color:var(--green)">+1,6%</strong> no primeiro trimestre de 2026 (Trading Economics, 2026), num registo de expansão moderada sem sinais de recessão imediata. O défice fiscal elevado dos EUA e as políticas tarifárias introduzidas pela administração Trump exercem pressão adicional sobre a inflação de longo prazo. As projeções da Fed de Dezembro de 2025 apontavam para uma inflação PCE de 3% em 2025 e 2,5% em 2026, com convergência para 2,0% em 2027 (Federal Reserve, 2025)
           </p>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
             <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
               <div style="color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">PIB EUA (anualizado)</div>
-              <div style="font-size:1.5rem;font-weight:800;color:var(--green)">+2,1%</div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--green)">+1,6%</div>
               <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Expansão moderada · 2026</div>
             </div>
             <div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
               <div style="color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Inflação LP (expectativas)</div>
-              <div style="font-size:1.5rem;font-weight:800;color:var(--gold)">4,0%</div>
+              <div style="font-size:1.5rem;font-weight:800;color:var(--gold)">3,0%</div>
               <div style="color:var(--muted);font-size:.78rem;margin-top:4px">Proj. Dez 2025</div>
             </div>
           </div>
@@ -408,14 +401,14 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         </div>
         <div class="panel-body">
           <p style="font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.88);margin-bottom:16px">
-            Este contexto macroeconómico tem implicações directas e bidireccionais para a Strategy. Por um lado, taxas de juro reais elevadas (<strong style="color:var(--red)">+1,8%</strong> na maturidade de 10 anos) exercem pressão sobre activos sem yield, como o Bitcoin. Por outro, o enfraquecimento relativo do dólar e a expectativa de futuros cortes de taxa historicamente fornecem um catalisador de valorização para as <em>criptomoedas</em>.
+            Este contexto macroeconómico tem implicações diretas e bidirecionais para a Strategy. Por um lado, taxas de juro reais elevadas exercem pressão sobre ativos sem yield, como a Bitcoin. Por outro, o enfraquecimento relativo do dólar e a expectativa de futuros cortes de taxa historicamente fornecem um catalisador de valorização para as criptomoedas.
           </p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
             <div style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.2);border-radius:10px;padding:14px 16px">
               <div style="color:var(--red);font-weight:700;font-size:.82rem;margin-bottom:8px">⬇ VENTOS CONTRÁRIOS</div>
               <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Taxas reais elevadas comprimem mNAV</li>
-                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Yield 10A ~5% encarece serviço da dívida ($8,25B)</li>
+                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Yield 10A ~4,5% encarece serviço da dívida ($8,19B)</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Custo de capital estruturalmente elevado</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Tarifas Trump pressionam inflação LP</li>
               </ul>
@@ -424,7 +417,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               <div style="color:var(--green);font-weight:700;font-size:.82rem;margin-bottom:8px">⬆ VENTOS FAVORÁVEIS</div>
               <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Futuros cortes de taxa favorecem cripto</li>
-                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>BTC atingiu máximo histórico de $126.000 em 2025</li>
+                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>BTC atingiu máximo histórico de $126.198 em 2025</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Aprovação ETFs manteve procura estrutural</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Fluxos institucionais continuam robustos</li>
               </ul>
@@ -432,7 +425,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
           </div>
           <div style="background:rgba(45,198,255,.07);border:1px solid rgba(45,198,255,.2);border-radius:8px;padding:12px 14px">
             <span style="color:var(--cyan);font-weight:700;font-size:.82rem">📌 Nota Metodológica:</span>
-            <span style="color:rgba(255,255,255,.8);font-size:.85rem;margin-left:6px">O Bitcoin atingiu um máximo histórico de <strong>$126.000</strong> em 2025, demonstrando que, apesar do ciclo restritivo, os fluxos institucionais e a aprovação dos ETFs spot mantiveram uma procura estrutural activa. Este contexto sustenta os pressupostos de valorização do BTC utilizados nos modelos DCF e mNAV deste trabalho.</span>
+            <span style="color:rgba(255,255,255,.8);font-size:.85rem;margin-left:6px">O Bitcoin atingiu um máximo histórico de <strong>$126.198</strong> em 2025, demonstrando que, apesar do ciclo restritivo, os fluxos institucionais e a aprovação dos ETFs spot mantiveram uma procura estrutural ativa.</span>
           </div>
         </div>
       </div>
@@ -448,7 +441,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
       <!-- mNAV Calculator -->
       <div class="mnav-calc">
-        <div class="mnav-title">mNAV Calculator — insere o preço de mercado actual do MSTR</div>
+        <div class="mnav-title">mNAV Calculator</div>
         <div class="mnav-calc-row">
           <label>Preço mercado MSTR ($):</label>
           <input class="cell" id="i_mktprice" value="177.50" style="width:120px">
@@ -471,8 +464,8 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
       <!-- Toggle -->
       <div class="toggle-tabs">
-        <button class="toggle-tab active-a" id="tab_a" onclick="setTab('A')">Método A — DCF Puro (BTC c/ desconto holding)</button>
-        <button class="toggle-tab" id="tab_b" onclick="setTab('B')">Método B — mNAV Target (BTC × múltiplo mercado)</button>
+        <button class="toggle-tab active-a" id="tab_a" onclick="setTab('A')">Método A: DCF Puro (BTC c/ desconto holding)</button>
+        <button class="toggle-tab" id="tab_b" onclick="setTab('B')">Método B: mNAV Target (BTC × múltiplo mercado)</button>
       </div>
 
       <!-- DCF Layout: sidebar + main -->
@@ -624,7 +617,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-bs">
     <div class="wrap-inner">
       <div class="page-title">Consolidated Balance Sheet</div>
-      <div class="page-sub">Strategy Inc — in thousands USD, except per share data</div>
+      <div class="page-sub">In thousands USD, except per share data</div>
 
       <div class="bs-kpis">
         <div class="kpi"><div class="k">Total Assets 2025</div><div class="v" style="color:var(--cyan)">$61.6B</div><div class="s">+138,5% YoY</div></div>
@@ -705,8 +698,8 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               <tr><td>Class B common stock</td><td>20</td><td>20</td><td>2</td><td class="yoy-pos">0,00%</td><td class="yoy-pos">+900,00%</td></tr>
               <tr><td>Additional paid-in capital</td><td>37 806 554</td><td>20 411 998</td><td>3 957 728</td><td class="yoy-pos">+85,22%</td><td class="yoy-pos">+415,75%</td></tr>
               <tr><td>Treasury stock, at cost</td><td>—</td><td>—</td><td>-782 104</td><td>—</td><td class="yoy-neg">-100,00%</td></tr>
-              <tr><td>Accumulated other comprehensive loss</td><td>-5 171</td><td>-15 384</td><td>-11 444</td><td class="yoy-pos">-66,39%</td><td class="yoy-neg">+34,43%</td></tr>
-              <tr><td>Retained earnings (accumulated deficit)</td><td>-6 321 763</td><td>-2 166 876</td><td>-999 234</td><td class="yoy-neg">-391,75%</td><td class="yoy-neg">+116,85%</td></tr>
+              <tr><td>Accumulated other comprehensive loss</td><td>-5 171</td><td>-15 384</td><td>-11 444</td><td class="yoy-neg">-66,39%</td><td class="yoy-pos">+34,43%</td></tr>
+              <tr><td>Retained earnings (accumulated deficit)</td><td>-6 321 763</td><td>-2 166 876</td><td>-999 234</td><td class="yoy-neg">-391,75%</td><td class="yoy-pos">+116,85%</td></tr>
               <tr class="subtotal"><td>Total stockholders' equity</td><td>44 123 458</td><td>18 229 984</td><td>2 164 972</td><td class="yoy-pos">+142,04%</td><td class="yoy-pos">+742,04%</td></tr>
               <tr class="total"><td>Total liabilities and stockholders' equity</td><td>61 641 082</td><td>25 843 685</td><td>4 762 528</td><td class="yoy-pos">+138,52%</td><td class="yoy-pos">+442,65%</td></tr>
             </tbody>
@@ -723,7 +716,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-is">
     <div class="wrap-inner">
       <div class="page-title">Income Statement</div>
-      <div class="page-sub">Strategy Inc — Consolidated Statements of Operations (in thousands USD, except per share)</div>
+      <div class="page-sub">Consolidated Statements of Operations (in thousands USD, except per share)</div>
 
       <!-- KPIs -->
       <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
@@ -798,7 +791,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               <tr class="section-hdr"><td colspan="6">Per Share Data</td></tr>
               <tr><td>Basic (loss) earnings per share</td><td class="neg">-15,23</td><td class="neg">-6,06</td><td class="pos">3,14</td><td class="yoy-neg">+151,32%</td><td class="yoy-neg">-292,99%</td></tr>
               <tr><td>Wtd. avg. shares outstanding — Basic</td><td>277 660</td><td>192 549</td><td>136 706</td><td class="yoy-pos">+44,20%</td><td class="yoy-pos">+40,85%</td></tr>
-              <tr><td>Diluted (loss) earnings per share</td><td class="neg">-15,23</td><td class="neg">-6,06</td><td class="pos">2,64</td><td class="yoy-neg">+151,32%</td><td class="yoy-neg">-329,55%</td></tr>
+              <tr><td>Diluted (loss) earnings per share</td><td class="neg">-15,23</td><td class="neg">-6,06</td><td class="pos">2,64</td><td class="yoy-neg">+151,32%</td><td class="yoy-pos">-329,55%</td></tr>
               <tr><td>Wtd. avg. shares outstanding — Diluted</td><td>277 660</td><td>192 549</td><td>165 662</td><td class="yoy-pos">+44,20%</td><td class="yoy-pos">+16,23%</td></tr>
             </tbody>
           </table>
@@ -815,7 +808,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-cf">
     <div class="wrap-inner">
       <div class="page-title">Cash Flow Statement</div>
-      <div class="page-sub">Strategy Inc — Consolidated Statements of Cash Flows (in thousands USD)</div>
+      <div class="page-sub">Consolidated Statements of Cash Flows (in thousands USD)</div>
 
       <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
         <div class="kpi"><div class="k">CFO 2025</div><div class="v" style="color:var(--red)">-$67.2M</div><div class="s">vs -$53.0M in 2024</div></div>
@@ -931,7 +924,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-ratios">
     <div class="wrap-inner">
       <div class="page-title">Financial Ratios</div>
-      <div class="page-sub">Strategy Inc — 2025 / 2024 / 2023 — Valores em destaque laranja: influência directa do BTC</div>
+      <div class="page-sub">Financial Ratios 2025/2024/2023</div>
 
       <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
         <div class="kpi"><div class="k">Gross Margin 2025</div><div class="v" style="color:var(--green)">68,69%</div><div class="s">Software business sólido</div></div>
@@ -975,7 +968,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               <tr style="color:var(--accent)"><td>Debt Ratio = Total Liabilities / Total Assets (With BTC)</td><td>17,19%</td><td>29,46%</td><td>54,54%</td></tr>
               <tr><td>Adjusted Debt Ratio = Total Liabilities / Total Assets Adjusted</td><td class="neg">380,26%</td><td class="neg">393,61%</td><td class="neg">228,65%</td></tr>
               <tr style="color:var(--accent)"><td>Mezzanine Ratio = Total Mezzanine Equity / Total Assets</td><td>11,23%</td><td>N/A</td><td>N/A</td></tr>
-              <tr style="color:var(--accent)"><td>Free Cash Flow to Equity STD (With BTC)</td><td class="neg">—</td><td class="pos">1 833 955</td><td class="pos">4 429 600</td></tr>
+              <tr style="color:var(--accent)"><td>Free Cash Flow to Equity STD (With BTC)</td><td class="neg">-1 833 955</td><td class="pos">4 429 600</td><td class="pos">260 448</td></tr>
               <tr><td>Free Cash Flow to Equity Adjusted (Without BTC)</td><td class="pos">1 885 301</td><td class="neg">-5 443 611</td><td class="neg">-193 116</td></tr>
             </tbody>
           </table>
@@ -1028,7 +1021,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-swot">
     <div class="wrap-inner">
       <div class="page-title">Análise SWOT</div>
-      <div class="page-sub">Strategy Inc — Pontos fortes, fraquezas, oportunidades e ameaças estratégicas</div>
+      <div class="page-sub">Strategy Inc: Pontos fortes, fraquezas, oportunidades e ameaças estratégicas</div>
 
       <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
         <div class="kpi"><div class="k">Forças</div><div class="v" style="color:var(--green)">6</div><div class="s">Vantagens estruturais</div></div>
@@ -1056,7 +1049,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
           <ul>
             <li>Concentração extrema em Bitcoin: o ativo constitui a vasta maioria do balanço; a falta de diversificação amplifica todos os riscos.</li>
             <li>Resultados líquidos negativos recorrentes: perda de $1,17 B em 2024 e de $3,85 B em 2025, embora maioritariamente não realizadas.</li>
-            <li>Endividamento elevado e obrigações preferenciais: $8,25 B em dívida + $8,47 B em valor nominal de ações preferenciais, com encargos fixos de $36,2 M anuais em juros.</li>
+            <li>Endividamento elevado e obrigações preferenciais: $8,19 B em dívida + $8,47 B em valor nominal de ações preferenciais, com encargos fixos de $36,2 M anuais em juros.</li>
             <li>Risco de pessoa-chave: Michael J. Saylor controla a maioria do poder de voto através de ações classe B, limitando a influência dos restantes acionistas.</li>
             <li>BTC Yield em declínio de 74,3% (2024) para 22,8% (2025), reflectindo o aumento da base e das emissões dilutivas.</li>
             <li>Cobertura de seguro irrisória face às holdings: apenas ~$520 M de cobertura combinada dos custódios para um portfolio de $58,9 B.</li>
@@ -1092,8 +1085,8 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <!-- ═══════════ PAGE: PESTEL ═══════════ -->
     <div class="page" id="page-pestel">
     <div class="wrap-inner">
-      <div class="page-title">Análise PESTEL</div>
-      <div class="page-sub">Strategy Inc — Factores macro-ambientais com impacto estratégico</div>
+      <div class="page-title">Análise PESTAL</div>
+      <div class="page-sub">Strategy Inc: Factores macro-ambientais com impacto estratégico</div>
 
       <div class="pestel-grid">
 
@@ -1120,7 +1113,6 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
             <div><div class="pestel-title">Económico</div><div class="pestel-sub">Ciclos macro, taxas de juro e estrutura de capital</div></div>
           </div>
           <div class="pestel-body">
-            <p>Receita principal vem de software de business intelligence e serviços associados, que sofrem com ciclos económicos onde períodos de incerteza ou recessão tendem a reduzir ou adiar investimentos corporativos.</p>
             <p>A forte alavancagem financeira (dívida relevante utilizada para acumular Bitcoin) torna a estrutura de capital sensível a taxas de juro e a correções mais fortes no preço do BTC, afetando balanço, rácios de solvência e capacidade de financiar crescimento futuro.</p>
             <p>Volatilidade elevada na cotação das ações, em grande parte ligada ao preço do Bitcoin, pode dificultar planeamento de longo prazo, emissão de ações e retenção de investidores de perfil mais conservador.</p>
             <p>Em 2025, a Strategy emitiu cinco classes de ações preferenciais (STRF, STRC, STRE, STRK, STRD), designadas colectivamente como "digital credit", que representam uma nova estrutura de capital com obrigações fixas de dividendos. Em dezembro de 2025, foi constituída uma USD Reserve de $2,25 mil milhões de dólares para suportar o pagamento desses dividendos e dos juros da dívida.</p>
@@ -1191,7 +1183,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="page" id="page-porter">
     <div class="wrap-inner">
       <div class="page-title">5 Forças de Porter</div>
-      <div class="page-sub">Strategy Inc — Análise da atractividade e dinâmica competitiva do sector</div>
+      <div class="page-sub">Strategy Inc: Análise da atractividade e dinâmica competitiva do sector</div>
 
       <div class="kpis" style="grid-template-columns:repeat(5,1fr);margin-bottom:18px">
         <div class="kpi"><div class="k">Rivalidade</div><div class="v" style="color:var(--red);font-size:.95rem">Elevada</div></div>
@@ -1206,12 +1198,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <!-- 1 Rivalidade -->
         <div class="porter-card center">
           <div class="porter-head">
-            <h3>1 — Rivalidade entre Concorrentes</h3>
+            <h3>1: Rivalidade entre Concorrentes</h3>
             <span class="porter-badge badge-high">Elevada</span>
           </div>
           <div class="porter-body">
             <p>O mercado de enterprise analytics e inteligência artificial empresarial caracteriza-se por uma rivalidade intensa e estruturalmente estável, dado o elevado número de operadores com escala global, a rápida evolução tecnológica e a dificuldade crescente de diferenciação de produto. A Strategy concorre directamente com líderes de mercado consolidados, nomeadamente IBM, Microsoft, Oracle, Salesforce e SAP, cujos recursos financeiros, carteiras de clientes e capacidades de integração de inteligência artificial superam consideravelmente os da empresa.</p>
-            <p>A esta dimensão acresce a pressão competitiva no segmento de activos digitais, onde a empresa disputa o acesso a capital com ETPs de Bitcoin spot, miners, exchanges digitais, fundos privados e, de forma crescentemente significativa, com instituições financeiras tradicionais que entraram no mercado de activos digitais após 2024.</p>
+            <p>A esta dimensão acresce a pressão competitiva no segmento de ativos digitais, onde a empresa disputa o acesso a capital com ETPs de Bitcoin spot, miners, exchanges digitais, fundos privados e, de forma crescentemente significativa, com instituições financeiras tradicionais que entraram no mercado de ativos digitais após 2024.</p>
             <div class="porter-meter">
               <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
               <div class="porter-bar"><div class="porter-bar-fill" style="width:88%;background:var(--red)"></div></div>
@@ -1222,12 +1214,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <!-- 2 Novas entradas -->
         <div class="porter-card">
           <div class="porter-head">
-            <h3>2 — Ameaça de Novas Entradas</h3>
+            <h3>2: Ameaça de Novas Entradas</h3>
             <span class="porter-badge badge-med">Moderada a Elevada</span>
           </div>
           <div class="porter-body">
             <p>No segmento de software empresarial, as barreiras à entrada são estruturalmente elevadas: exigem investimento substancial em I&D, necessidade de certificações de segurança exigentes (designadamente a acreditação FedRAMP, indispensável para operar junto de clientes governamentais nos EUA), e da consolidação de ecossistemas de parceiros estratégicos com fornecedores de infraestrutura cloud como AWS, Microsoft e Google.</p>
-            <p>No domínio dos activos digitais, as barreiras estruturais têm vindo a diminuir de forma assinalável: a aprovação pela SEC de ETPs de Bitcoin spot em janeiro de 2024 democratizou o acesso dos investidores institucionais e individuais ao Bitcoin através de estruturas de investimento convencionais, introduzindo novos veículos competitivos que desafiam a proposta de valor da Strategy como veículo privilegiado de exposição ao activo.</p>
+            <p>No domínio dos activos digitais, as barreiras estruturais têm vindo a diminuir de forma assinalável: a aprovação pela SEC de ETPs de Bitcoin spot em janeiro de 2024 democratizou o acesso dos investidores institucionais e individuais ao Bitcoin através de estruturas de investimento convencionais, introduzindo novos veículos competitivos que desafiam a proposta de valor da Strategy como veículo privilegiado de exposição ao ativo.</p>
             <p>O 10-K de 2025 documenta explicitamente que a crescente adopção de estratégias de acumulação de Bitcoin por outras empresas representa um vector de pressão adicional sobre a disponibilidade e o custo de financiamento.</p>
             <div class="porter-meter">
               <div class="porter-meter-label"><span>Baixa</span><span>Elevada</span></div>
@@ -1239,7 +1231,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <!-- 3 Substitutos -->
         <div class="porter-card">
           <div class="porter-head">
-            <h3>3 — Ameaça de Produtos Substitutos</h3>
+            <h3>3: Ameaça de Produtos Substitutos</h3>
             <span class="porter-badge badge-med">Moderada a Elevada</span>
           </div>
           <div class="porter-body">
@@ -1255,11 +1247,11 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <!-- 4 Fornecedores -->
         <div class="porter-card">
           <div class="porter-head">
-            <h3>4 — Poder de Negociação dos Fornecedores</h3>
+            <h3>4: Poder de Negociação dos Fornecedores</h3>
             <span class="porter-badge badge-med">Moderada a Elevada</span>
           </div>
           <div class="porter-body">
-            <p>A Strategy apresenta uma dependência estrutural de dois grupos de fornecedores críticos: os hiperescaladores de infraestrutura cloud — AWS, Microsoft Azure e Google Cloud — que suportam a operacionalidade da plataforma Strategy One; e os prestadores de serviços de custódia institucional de Bitcoin (Coinbase, Anchorage e Fidelity), responsáveis pela salvaguarda dos activos digitais da empresa.</p>
+            <p>A Strategy apresenta uma dependência estrutural de dois grupos de fornecedores críticos: os hiperescaladores de infraestrutura cloud: AWS, Microsoft Azure e Google Cloud, que suportam a operacionalidade da plataforma Strategy One e os prestadores de serviços de custódia institucional de Bitcoin (Coinbase, Anchorage e Fidelity), responsáveis pela salvaguarda dos ativos digitais da empresa.</p>
             <p>Embora a empresa tenha estabelecido parcerias diversificadas com vista a mitigar a concentração de risco, a natureza especializada destes mercados confere a esses fornecedores um poder de negociação considerável.</p>
             <p>O 10-K de 2025 nota que, na medida em que um número crescente de empresas adopta estratégias de Bitcoin análogas à Strategy, os prestadores de serviços de custódia e de execução poderão enfrentar uma procura acrescida, com potenciais repercussões negativas sobre a qualidade do serviço prestado e as condições contratuais negociáveis.</p>
             <div class="porter-meter">
@@ -1272,7 +1264,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <!-- 5 Clientes -->
         <div class="porter-card">
           <div class="porter-head">
-            <h3>5 — Poder de Negociação dos Clientes</h3>
+            <h3>5: Poder de Negociação dos Clientes</h3>
             <span class="porter-badge badge-med">Moderada a Elevada</span>
           </div>
           <div class="porter-body">
@@ -1297,12 +1289,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
      PÁGINA: INSTRUMENTOS DE CAPITAL
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="page" id="page-instrumentos">
-  <h1 class="page-title">Instrumentos de Capital — Títulos Preferenciais</h1>
+  <h1 class="page-title">Instrumentos Financeiros Listados da Strategy</h1>
 
   <div class="section-card">
     <p>
-      Em 2025, a Strategy emitiu cinco classes de títulos preferenciais perpétuos — 
-      designados colectivamente como <em>digital credit</em> — com estruturas distintas 
+      Em 2025, a Strategy emitiu cinco classes de títulos preferenciais perpétuos,
+      designados colectivamente como <em>digital credit</em>, com estruturas distintas 
       de dividendo, seniority de liquidação e opcionalidade de conversão. 
       A tabela seguinte sintetiza as principais características de cada instrumento.
     </p>
@@ -1387,7 +1379,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
       </table>
     </div>
     <p style="font-size:0.85em;color:#888;text-align:center;">
-      <em>Tabela — Comparação dos Títulos Preferenciais Perpétuos da Strategy (2025)</em>
+      <em>Instrumentos Financeiros Listados da Strategy</em>
     </p>
   </div>
 </div>
@@ -1398,8 +1390,8 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
   <!-- ═══════════════════════════════════════════════════════ -->
   <div class="page" id="page-multiples">
     <div class="wrap-inner">
-      <div class="page-title">Avaliação pelos Múltiplos — SOTP</div>
-      <div class="page-sub">Strategy Inc — Sum-of-the-Parts (EV/Revenue + mNAV) · Dados: Form 10-K 2025</div>
+      <div class="page-title">Avaliação pelos Múltiplos  (SOTP)</div>
+      <div class="page-sub">Sum-of-the-Parts (EV/Revenue + mNAV)</div>
 
       <!-- KPIs -->
       <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
@@ -1428,7 +1420,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
       <!-- Nota metodológica -->
       <div style="background:var(--surface2);border-left:4px solid var(--gold);padding:14px 18px;border-radius:6px;margin-bottom:24px;font-size:0.9rem;line-height:1.6;color:var(--text2)">
         <strong style="color:var(--gold)">Nota Metodológica</strong><br>
-        O múltiplo <strong>EV/EBITDA</strong> é inaplicável: o EBITDA reportado de −$5.394.385 M está inteiramente distorcido pela perda não realizada de $5.403.476 M sobre Bitcoin (norma ASU 2023-08). Utiliza-se o <strong>EV/Revenue</strong> para o segmento de software e o <strong>mNAV</strong> para a tesouraria Bitcoin, numa metodologia SOTP (<em>Sum-of-the-Parts</em>). A dívida é apurada diretamente do Balanço Consolidado (Current portion of LTD net + LT debt net), líquida de custos de emissão e desconto não amortizado.
+        O múltiplo <strong>EV/EBITDA</strong> é inaplicável: o EBITDA reportado de −$5.418.868 M está inteiramente distorcido pela perda não realizada de $5.403.476 M sobre Bitcoin (norma ASU 2023-08). Utiliza-se o <strong>EV/Revenue</strong> para o segmento de software e o <strong>mNAV</strong> para a tesouraria Bitcoin, numa metodologia SOTP (<em>Sum-of-the-Parts</em>). A dívida é apurada diretamente do Balanço Consolidado (Current portion of LTD net + LT debt net).
       </div>
 
       <!-- Tabela SOTP -->
@@ -1447,7 +1439,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
             <tr><td>Múltiplo EV/Revenue</td><td>3,0x</td><td>4,0x</td><td>5,0x</td></tr>
             <tr><td>mNAV</td><td>1,00x</td><td>1,23x</td><td>1,57x</td></tr>
             <tr style="background:var(--surface2)"><td><strong>EV Software (mil $)</strong></td><td>$1.431.699</td><td>$1.908.932</td><td>$2.386.165</td></tr>
-            <tr style="background:var(--surface2)"><td><strong>Valor BTC — mNAV (mil $)</strong></td><td>$50.663.873</td><td>$62.316.564</td><td>$79.542.281</td></tr>
+            <tr style="background:var(--surface2)"><td><strong>Valor BTC: mNAV (mil $)</strong></td><td>$50.663.873</td><td>$62.316.564</td><td>$79.542.281</td></tr>
             <tr style="background:var(--surface2)"><td><strong>Equity Value Total (mil $)</strong></td><td>$52.095.572</td><td>$64.225.496</td><td>$81.928.446</td></tr>
             <tr style="font-size:1.15rem;font-weight:700">
               <td>Preço Alvo / Ação ($)</td>
@@ -1489,7 +1481,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
       <!-- Insight mNAV -->
       <div style="background:rgba(255,193,7,0.08);border:1px solid var(--gold);border-radius:8px;padding:16px 20px;font-size:0.92rem;line-height:1.7;color:var(--text2)">
-        <strong style="color:var(--gold)">Conclusão Central:</strong> O segmento de software contribui apenas <strong>2,97%</strong> do equity value no cenário base — os restantes <strong>97%</strong> provêm do Bitcoin. Uma variação de 0,10x no mNAV corresponde a <strong>≈ $14,69 por ação</strong>, magnitude que supera em mais de 3× o contributo total do segmento de software. A Strategy é avaliada pelo mercado exclusivamente como um veículo de exposição alavancada a Bitcoin.
+        <strong style="color:var(--gold)">Conclusão Central:</strong> O segmento de software contribui apenas <strong>2,97%</strong> do equity value no cenário base, os restantes <strong>97,03%</strong> provêm do Bitcoin. Uma variação de 0,10x no mNAV corresponde a <strong>≈ $15 por ação</strong>, magnitude que supera em mais de 3× o contributo total do segmento de software. A Strategy é avaliada pelo mercado exclusivamente como um veículo de exposição alavancada a Bitcoin.
       </div>
 
     </div>
@@ -1501,7 +1493,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
   <div class="page" id="page-rec">
     <div class="wrap-inner">
       <div class="page-title">Recomendação de Investimento</div>
-      <div class="page-sub">Strategy Inc — Triangulação DCF + SOTP · Cotação referência: $151,95 (31/12/2025)</div>
+      <div class="page-sub">Triangulação DCF + SOTP · Cotação referência: $151,95 (31/12/2025)</div>
 
       <!-- KPIs recomendação -->
       <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
@@ -1581,27 +1573,27 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
             <tr>
               <td><strong>MSTR</strong></td>
               <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ BUY</td>
-              <td>Cotação $151,95 abaixo do cenário base ponderado ($198,74); upside de ~55% pela normalização do mNAV para a média histórica (1,57x) sem apreciação adicional do BTC</td>
+              <td>Cotação de $151,95 abaixo do cenário base ponderado ($198,74).</td>
             </tr>
             <tr>
               <td><strong>STRF</strong></td>
               <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ Comprar</td>
-              <td>10% ao ano, maior senioridade na hierarquia de liquidação; comportamento análogo a obrigação de alto rendimento perpétua</td>
+              <td>10% ao ano, maior senioridade na hierarquia de liquidação, comportamento análogo a obrigação de alto rendimento perpétua.</td>
             </tr>
             <tr>
               <td><strong>STRC</strong></td>
               <td style="color:#27ae60;font-weight:700;white-space:nowrap">✅ Comprar</td>
-              <td>Taxa variável com estabilidade a $100; perfil de mercado monetário de alto rendimento; maior liquidez entre as preferenciais</td>
+              <td>Taxa variável com estabilidade a $100; perfil de mercado monetário de alto rendimento; maior liquidez entre as preferenciais.</td>
             </tr>
             <tr>
               <td><strong>STRD</strong></td>
               <td style="color:#aaa;font-weight:700;white-space:nowrap">⚪ Neutro</td>
-              <td>Dividendo não cumulativo — valor perde-se definitivamente em caso de omissão trimestral</td>
+              <td>Dividendo não cumulativo: dividendo omitido perde-se definitivamente.</td>
             </tr>
             <tr>
               <td><strong>STRK</strong></td>
               <td style="color:#f39c12;font-weight:700;white-space:nowrap">⚠️ Especulativo</td>
-              <td>Opcionalidade de conversão a $1.000/ação exige forte apreciação da MSTR para ser exercida</td>
+              <td>Opcionalidade de conversão a $1.000/ação exige forte apreciação da MSTR.</td>
             </tr>
           </tbody>
         </table>
@@ -1612,7 +1604,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
         <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
           <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Concentração Extrema</div>
-          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">95,5% do ativo total em Bitcoin. Equity Ratio ajustado sem BTC: −528,54%. Toda a solvência depende do preço do Bitcoin.</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">Toda a solvência depende do preço do Bitcoin.</div>
         </div>
         <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
           <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Risco de Refinanciamento</div>
@@ -1624,13 +1616,13 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         </div>
         <div style="background:rgba(231,76,60,0.08);border:1px solid #e74c3c;border-radius:8px;padding:14px 16px">
           <div style="font-weight:700;color:#e74c3c;margin-bottom:8px">⚠️ Diluição Estrutural</div>
-          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">Emissões ATM contínuas (+8%/ano estimado). Sem acumulação de BTC, a diluição anularia os ganhos por ação mesmo com apreciação do Bitcoin.</div>
+          <div style="font-size:0.88rem;color:var(--text2);line-height:1.6">Emissões ATM contínuas.</div>
         </div>
       </div>
 
       <!-- Box tese central -->
       <div style="background:rgba(39,174,96,0.08);border:1px solid #27ae60;border-radius:8px;padding:16px 20px;font-size:0.93rem;line-height:1.7;color:var(--text2)">
-        <strong style="color:#27ae60">Tese de Investimento Central:</strong> A cotação de $151,95 em 31/12/2025 atribuía à Strategy um mNAV próximo de 1,00x — muito abaixo da média histórica de 1,57x (2023–2024). A recuperação do mNAV para a média histórica, <em>sem qualquer apreciação adicional do Bitcoin</em>, implicaria um preço-alvo próximo de <strong>$236</strong>, representando um upside de aproximadamente <strong>55%</strong>. A tese assenta em dois vetores independentes: normalização do mNAV + apreciação de longo prazo do Bitcoin.
+        <strong style="color:#27ae60">Tese de Investimento Central:</strong> A cotação de $151,95 em 31/12/2025 atribuía à Strategy um mNAV abaixo da média histórica de 1,57x (2023–2024). A recuperação do mNAV para a média histórica, <em>sem qualquer apreciação adicional do Bitcoin</em>, implicaria um preço-alvo próximo de <strong>$236,16</strong>, representando um upside de <strong>55,42%</strong>. A tese assenta em dois vetores independentes: normalização do mNAV + apreciação de longo prazo do Bitcoin.
       </div>
 
     </div>
@@ -1649,7 +1641,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <div class="wrap-inner">
 
       <div style="margin-bottom:22px">
-        <h1 style="font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">🎯 Análise de Analistas e Preços-Alvo</h1>
+        <h1 style="font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Análise de Analistas e Preços-Alvo</h1>
         <p style="color:var(--muted);font-size:.88rem">Cobertura <em>sell-side</em> sobre a acção MSTR · Data de referência: Junho 2026</p>
       </div>
 
@@ -1717,7 +1709,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
                   <td style="font-weight:700">TD Cowen</td>
                   <td style="text-align:center"><span style="background:rgba(25,195,125,.18);color:var(--green);padding:3px 10px;border-radius:999px;font-size:.78rem;font-weight:700">Buy</span></td>
                   <td style="color:var(--green);font-weight:700">$400</td>
-                  <td style="color:var(--muted)">junho 26</td>
+                  <td style="color:var(--muted)">maio 26</td>
                 </tr>
                 <tr>
                   <td style="font-weight:700">Canaccord Genuity</td>
@@ -1740,7 +1732,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               </tbody>
             </table>
           </div>
-          <p style="color:var(--muted);font-size:.75rem;margin-top:8px;font-style:italic">Figura 24 — Analistas e Preços-Alvo</p>
+          <p style="color:var(--muted);font-size:.75rem;margin-top:8px;font-style:italic">Analistas e Preços-Alvo</p>
         </div>
       </div>
 
@@ -1751,7 +1743,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         </div>
         <div class="panel-body">
           <p style="font-size:.9rem;line-height:1.7;color:rgba(255,255,255,.88);margin-bottom:14px">
-            A amplitude do intervalo de preços-alvo, entre <strong style="color:var(--red)">$54 (Wells Fargo)</strong> e <strong style="color:var(--green)">$570 (Benchmark)</strong>, é reveladora da natureza binária do risco inerente à Strategy. Os analistas mais optimistas, como a Benchmark e a TD Cowen, sustentam preços-alvo elevados com base em cenários de valorização continuada do Bitcoin e de expansão do prémio de mercado (mNAV), enquanto a posição mais conservadora da Wells Fargo reflecte preocupações estruturais com a diluição accionista, a alavancagem financeira de <strong>$8,25 mil milhões</strong> em dívida e a compressão do mNAV abaixo de 1,0x.
+            A amplitude do intervalo de preços-alvo, entre <strong style="color:var(--red)">$54 (Wells Fargo)</strong> e <strong style="color:var(--green)">$570 (Benchmark)</strong>, é reveladora da natureza binária do risco inerente à Strategy. Os analistas mais optimistas, como a Benchmark e a TD Cowen, sustentam preços-alvo elevados com base em cenários de valorização continuada do Bitcoin e de expansão do prémio de mercado (mNAV), enquanto a posição mais conservadora da Wells Fargo reflecte preocupações estruturais com a diluição accionista, a alavancagem financeira de <strong>$8,19 mil milhões</strong> em dívida e a compressão do mNAV abaixo de 1,0x.
           </p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div style="background:rgba(25,195,125,.07);border:1px solid rgba(25,195,125,.2);border-radius:10px;padding:14px 16px">
@@ -1767,7 +1759,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
               <div style="color:var(--red);font-weight:700;font-size:.82rem;margin-bottom:8px">🐻 TESE BEAR (Wells Fargo)</div>
               <ul style="list-style:none;display:flex;flex-direction:column;gap:6px">
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Diluição accionista estrutural</li>
-                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>$8,25B dívida + obrigações preferenciais</li>
+                <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>$8,19B dívida + obrigações preferenciais</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Compressão mNAV abaixo de 1,0x</li>
                 <li style="font-size:.84rem;color:rgba(255,255,255,.8);padding-left:12px;position:relative"><span style="position:absolute;left:0">·</span>Risco de execução na acumulação de BTC</li>
               </ul>
@@ -1845,14 +1837,14 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
   <!-- ── Secção 2: Heatmap Correlação Estática ── -->
   <div class="section-card">
-    <h2 class="section-title">Correlação Estática — Matriz de Pearson</h2>
+    <h2 class="section-title">Correlação Estática: Matriz de Pearson</h2>
     <p>
       A ligação estrutural entre a Strategy e a Bitcoin é corroborada pela análise de correlação 
       estática. A matriz de correlação de Pearson, calculada com base em retornos mensais para 
       o período 2020–2026, revela uma correlação de <strong>0,74</strong> entre a MSTR e o BTC-USD. 
       Este valor é significativamente superior à correlação da MSTR com o NASDAQ (<strong>0,57</strong>) 
       e à do BTC-USD com o NASDAQ (<strong>0,53</strong>), confirmando que o comportamento da ação da 
-      Strategy é determinado predominantemente pelo preço do Bitcoin, e não pela dinâmica geral 
+      Strategy é determinado predominantemente pelo preço da Bitcoin, e não pela dinâmica geral 
       do mercado tecnológico.
     </p>
     <div style="text-align:center; margin:24px 0;">
@@ -1867,10 +1859,10 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
 
   <!-- ── Secção 3: Scatter Plot ── -->
   <div class="section-card">
-    <h2 class="section-title">Scatter Plot — Retornos Mensais MSTR vs BTC</h2>
+    <h2 class="section-title">Scatter Plot: Retornos Mensais MSTR vs BTC</h2>
     <p>
       A análise de dispersão dos retornos mensais confirma visualmente a relação linear positiva 
-      entre a MSTR e o BTC-USD, com um coeficiente Beta (β) estimado de <strong>0,43</strong>. 
+      entre a MSTR e o BTC-USD. 
       A distribuição dos pontos em torno da linha de tendência evidencia a natureza de 
       <em>proxy</em> alavancado da Strategy relativamente ao Bitcoin: a empresa amplifica os 
       movimentos do ativo subjacente, tanto nos ciclos de valorização como nos de contração.
@@ -1917,7 +1909,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <p>
       A persistência de uma correlação elevada, mesmo após a introdução dos ETFs Spot, reforça 
       a tese de que a Strategy não é simplesmente um substituto do Bitcoin, mas um instrumento 
-      distinto — um <em>proxy</em> alavancado que amplifica tanto os ganhos como as perdas do ativo 
+      distinto, um <em>proxy</em> alavancado que amplifica tanto os ganhos como as perdas do ativo 
       subjacente. Em março de 2026, a empresa detinha <strong>762.099 BTC</strong> no seu balanço, 
       equivalentes a aproximadamente <strong>3,6%</strong> da oferta total de Bitcoin, o que confere à 
       cotação da MSTR uma sensibilidade estrutural, e não meramente correlacional, às variações 
@@ -1941,7 +1933,7 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
     <h2 class="section-title">Strategy: Valuation by BTC and Liquidity Stress Test</h2>
     <p>
       O modelo de avaliação da Strategy assenta numa metodologia de <em>Stress Test</em> de liquidez 
-      com três cenários — <strong>Valor base</strong>, <strong>Stress severo</strong> e <strong>Crise</strong> —, 
+      com três cenários: <strong>Valor base</strong>, <strong>Stress severo</strong> e <strong>Crise</strong> —, 
       permitindo avaliar a resiliência do balanço da empresa face a diferentes níveis de 
       drawdown do Bitcoin e compressão do mNAV. Os pressupostos centrais utilizados são os seguintes:
     </p>
@@ -2026,12 +2018,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
       </table>
     </div>
     <p style="font-size:0.85em;color:#888;text-align:center;">
-      <em>Tabela 1 — Pressupostos do Modelo Strategy: Valuation by BTC and Liquidity Stress Test</em>
+      <em>Pressupostos do Modelo Strategy: Valuation by BTC and Liquidity Stress Test</em>
     </p>
     <div style="text-align:center;margin-top:8px;">
       <a href="https://strategy-model.streamlit.app/" target="_blank"
-         style="display:inline-block;padding:10px 24px;background:#1e3a5f;color:#fff;border-radius:6px;text-decoration:none;font-size:0.92em;font-weight:600;letter-spacing:0.3px;">
-        🚀 Abrir Modelo Interactivo →
+         style="display:inline-block;padding:10px 24px;background:#f7931a;color:#fff;border-radius:6px;text-decoration:none;font-size:0.92em;font-weight:600;letter-spacing:0.3px;">
+        Abrir Modelo Interactivo →
       </a>
     </div>
   </div>
@@ -2040,9 +2032,9 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
   <div class="section-card">
     <h2 class="section-title">Modelo Macro Bitcoin</h2>
     <p>
-      O modelo macro de precificação do Bitcoin integra quatro vetores analíticos independentes — 
+      O modelo macro de precificação do Bitcoin integra quatro vetores analíticos independentes: 
       <strong>Stock-to-Flow (S2F)</strong>, <strong>crescimento da oferta monetária M2</strong>, 
-      <strong>Lei de Metcalfe</strong> e <strong>curva de adoção</strong> — cujos outputs são 
+      <strong>Lei de Metcalfe</strong> e <strong>curva de adoção</strong>, cujos outputs são 
       ponderados de forma configurável para produzir um preço-alvo composto. 
       Os pressupostos base utilizados no modelo são os seguintes:
     </p>
@@ -2058,12 +2050,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
         <tbody>
           <tr style="background:#f7f9fc;color:#1a1a1a;">
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Horizonte (anos)</td>
-            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">Configurável</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">1 ano</td>
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Período de projeção do modelo</td>
           </tr>
           <tr style="color:#1a1a1a;">
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Crescimento M2 anual (%)</td>
-            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">Configurável</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">6%</td>
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Taxa de expansão da oferta monetária global M2</td>
           </tr>
           <tr style="background:#f7f9fc;color:#1a1a1a;">
@@ -2083,8 +2075,8 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
           </tr>
           <tr style="color:#1a1a1a;">
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Velocidade adopção</td>
-            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">0,33</td>
-            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Parâmetro logístico da curva de adopção (S-curve)</td>
+            <td style="padding:9px 14px;text-align:right;border-bottom:1px solid #e0e6ed;">0,35</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Parâmetro logístico da curva de adopção</td>
           </tr>
           <tr style="background:#f7f9fc;color:#1a1a1a;">
             <td style="padding:9px 14px;border-bottom:1px solid #e0e6ed;">Expoente Metcalfe</td>
@@ -2110,12 +2102,12 @@ table.fin{width:100%;border-collapse:collapse;font-size:.88rem}
       </table>
     </div>
     <p style="font-size:0.85em;color:#888;text-align:center;">
-      <em>Tabela 2 — Pressupostos do Modelo Macro Bitcoin (parâmetros base configuráveis no modelo interactivo)</em>
+      <em>Pressupostos do Modelo Macro Bitcoin (parâmetros base configuráveis no modelo interactivo)</em>
     </p>
     <div style="text-align:center;margin-top:8px;">
       <a href="https://btc-model-marcos.streamlit.app/" target="_blank"
          style="display:inline-block;padding:10px 24px;background:#f7931a;color:#fff;border-radius:6px;text-decoration:none;font-size:0.92em;font-weight:600;letter-spacing:0.3px;">
-        🚀 Abrir Modelo Interactivo →
+        Abrir Modelo Interactivo →
       </a>
     </div>
   </div>
